@@ -142,11 +142,6 @@ if ($conn->connect_error) {
 </head>
 <body>
 
-<!-- Top Bar removed -->
-
-
-<body>
-
     <!-- Barra de navegación COPIADA exactamente de habitaciones.html -->
     <header>
         <div class="container">
@@ -178,9 +173,6 @@ if ($conn->connect_error) {
 
     <!-- Aquí continúa el resto de tu página: hero, sección de habitaciones dinámicas, whatsapp float, etc. -->
 
-</body>
-</html>
-
 <!-- Habitaciones -->
 <section class="py-5 py-lg-5">
     <div class="container">
@@ -188,10 +180,7 @@ if ($conn->connect_error) {
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 g-xl-5">
 
             <?php
-            $result = $conn->query("
-                SELECT * FROM habitaciones 
-                ORDER BY precio ASC
-            ");
+            $result = $conn->query("SELECT * FROM habitaciones ORDER BY precio ASC");
 
             if ($result->num_rows === 0) {
                 echo '<div class="col-12 text-center py-5">
@@ -203,6 +192,8 @@ if ($conn->connect_error) {
                 $img = $row['imagen'] ?: 'https://via.placeholder.com/800x600/cccccc/ffffff?text=Habitación';
                 $caracteristicas = nl2br(htmlspecialchars($row['caracteristicas'] ?? ''));
                 $caracteristicas = str_replace("\n", "</li>\n<li>", $caracteristicas);
+                $tipo = htmlspecialchars($row['tipo_de_habitacion'] ?? '');
+                $disponibles = isset($row['habitaciones_disponibles']) ? intval($row['habitaciones_disponibles']) : 0;
             ?>
 
             <div class="col">
@@ -212,13 +203,24 @@ if ($conn->connect_error) {
                          alt="<?= htmlspecialchars($row['nombre']) ?>">
                     
                     <div class="card-body d-flex flex-column">
-                        <h3 class="card-title fw-bold mb-3">
-                            <?= htmlspecialchars($row['nombre']) ?>
-                        </h3>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h3 class="card-title fw-bold mb-0">
+                                <?= htmlspecialchars($row['nombre']) ?>
+                            </h3>
+                            <?php if ($tipo): ?><span class="badge bg-primary"><?= $tipo ?></span><?php endif; ?>
+                        </div>
                         
                         <p class="text-muted mb-4 flex-grow-1">
                             <?= nl2br(htmlspecialchars($row['descripcion'])) ?>
                         </p>
+
+                        <div class="mb-3">
+                            <?php if ($disponibles > 0): ?>
+                                <small class="text-success"><i class="bi bi-check-circle"></i> <?= $disponibles ?> disponible(s)</small>
+                            <?php else: ?>
+                                <small class="text-danger"><i class="bi bi-x-circle"></i> Sin disponibilidad</small>
+                            <?php endif; ?>
+                        </div>
 
                         <?php if (!empty($row['caracteristicas'])): ?>
                         <ul class="features-list list-unstyled mb-4">
@@ -235,8 +237,8 @@ if ($conn->connect_error) {
                             </div>
                             
                             <a href="reservar.php?id=<?= $row['id_habitacion'] ?>" 
-                               class="btn btn-reserve w-100 text-white">
-                                Reservar ahora
+                               class="btn btn-reserve w-100 text-white" <?= $disponibles == 0 ? 'disabled' : '' ?>>
+                                <?= $disponibles > 0 ? 'Reservar ahora' : 'No disponible' ?>
                             </a>
                         </div>
                     </div>

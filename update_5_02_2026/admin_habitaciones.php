@@ -41,14 +41,16 @@ $id     = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $mensaje = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nombre         = trim($_POST['nombre']);
-    $descripcion    = trim($_POST['descripcion']);
-    $precio         = floatval($_POST['precio']);
-    $imagen         = isset($_FILES['imagen']) && $_FILES['imagen']['size'] > 0 ? uploadImage($_FILES['imagen']) : null;
+    $nombre                   = trim($_POST['nombre']);
+    $descripcion              = trim($_POST['descripcion']);
+    $precio                   = floatval($_POST['precio']);
+    $caracteristicas          = trim($_POST['caracteristicas'] ?? '');
+    $disponibles              = intval($_POST['habitaciones_disponibles'] ?? 0);
+    $imagen                   = isset($_FILES['imagen']) && $_FILES['imagen']['size'] > 0 ? uploadImage($_FILES['imagen']) : null;
 
     if ($action == 'create') {
-        $stmt = $conn->prepare("INSERT INTO habitaciones (nombre, descripcion, precio, imagen) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssds", $nombre, $descripcion, $precio, $imagen);
+        $stmt = $conn->prepare("INSERT INTO habitaciones (nombre, descripcion, caracteristicas, precio, habitaciones_disponibles, imagen) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssdsis", $nombre, $descripcion, $caracteristicas, $precio, $disponibles, $imagen);
         if ($stmt->execute()) {
             $mensaje = '<div class="alert alert-success">Habitación creada correctamente.</div>';
         } else {
@@ -57,12 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif ($action == 'edit' && $id > 0) {
         if ($imagen) {
             // Nueva imagen → actualizar todo
-            $stmt = $conn->prepare("UPDATE habitaciones SET nombre=?, descripcion=?, precio=?, imagen=? WHERE id_habitacion=?");
-            $stmt->bind_param("ssdsi", $nombre, $descripcion, $precio, $imagen, $id);
+            $stmt = $conn->prepare("UPDATE habitaciones SET nombre=?, descripcion=?, caracteristicas=?, precio=?, habitaciones_disponibles=?, imagen=? WHERE id_habitacion=?");
+            $stmt->bind_param("ssdissi", $nombre, $descripcion, $caracteristicas, $precio, $disponibles, $imagen, $id);
         } else {
             // Mantener imagen anterior
-            $stmt = $conn->prepare("UPDATE habitaciones SET nombre=?, descripcion=?, precio=? WHERE id_habitacion=?");
-            $stmt->bind_param("ssdi", $nombre, $descripcion, $precio, $id);
+            $stmt = $conn->prepare("UPDATE habitaciones SET nombre=?, descripcion=?, caracteristicas=?, precio=?, habitaciones_disponibles=? WHERE id_habitacion=?");
+            $stmt->bind_param("ssdisi", $nombre, $descripcion, $caracteristicas, $precio, $disponibles, $id);
         }
         if ($stmt->execute()) {
             $mensaje = '<div class="alert alert-success">Habitación actualizada correctamente.</div>';
@@ -346,6 +348,18 @@ if ($action == 'edit' && $id > 0) {
                         <div class="mb-3">
                             <label class="form-label fw-bold">Precio por noche (USD)</label>
                             <input type="number" step="0.01" name="precio" class="form-control" value="<?php echo $habitacion ? $habitacion['precio'] : ''; ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Habitaciones Disponibles</label>
+                            <input type="number" min="0" name="habitaciones_disponibles" class="form-control" value="<?php echo $habitacion ? intval($habitacion['habitaciones_disponibles'] ?? 0) : 0; ?>" required>
+                            <div class="form-text">Cantidad de habitaciones de este tipo disponibles para reservar.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Características</label>
+                            <textarea name="caracteristicas" class="form-control" rows="3"><?php echo $habitacion ? htmlspecialchars($habitacion['caracteristicas'] ?? '') : ''; ?></textarea>
+                            <div class="form-text">Lista breve de características o servicios (separados por comas o saltos).</div>
                         </div>
 
                         <div class="mb-4">
