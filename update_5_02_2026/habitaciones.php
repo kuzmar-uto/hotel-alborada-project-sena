@@ -236,10 +236,15 @@ if ($conn->connect_error) {
                                 </div>
                             </div>
                             
-                            <a href="reservar.php?id=<?= $row['id_habitacion'] ?>" 
-                               class="btn btn-reserve w-100 text-white" <?= $disponibles == 0 ? 'disabled' : '' ?>>
+                            <button type="button" 
+                                    class="btn btn-reserve w-100 text-white open-reserve-btn" 
+                                    data-id="<?= $row['id_habitacion'] ?>"
+                                    data-name="<?= htmlspecialchars($row['nombre']) ?>"
+                                    data-price="<?= number_format($row['precio'], 2, '.', '') ?>"
+                                    data-tipo="<?= htmlspecialchars($tipo) ?>"
+                                    <?= $disponibles == 0 ? 'disabled' : '' ?>>
                                 <?= $disponibles > 0 ? 'Reservar ahora' : 'No disponible' ?>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -260,6 +265,123 @@ if ($conn->connect_error) {
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Reserva Modal -->
+<div class="modal fade" id="reserveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:12px;overflow:hidden;">
+            <div class="modal-header" style="background:linear-gradient(90deg,var(--primary),var(--primary-dark));color:white;border-bottom:none;">
+                <h5 class="modal-title">Confirmar Reserva</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="reserveForm">
+                    <input type="hidden" name="room" id="res-room">
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de documento</label>
+                        <select class="form-select" name="documento_tipo" id="res-doc-type" required>
+                            <option value="tarjeta_identidad">Tarjeta de identidad</option>
+                            <option value="cedula">Cédula</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Número de documento</label>
+                        <input type="text" name="documento_numero" id="res-doc-number" class="form-control" pattern="\d+" inputmode="numeric" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de habitación</label>
+                        <select class="form-select" name="tipo_habitacion" id="res-room-type" required>
+                            <option value="sencilla">Sencilla</option>
+                            <option value="doble">Doble</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Precio por noche</label>
+                        <input type="text" name="price" id="res-price" class="form-control" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del titular</label>
+                        <input type="text" name="name" id="res-name" class="form-control" required>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Confirmar reserva</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var reserveModal = new bootstrap.Modal(document.getElementById('reserveModal'));
+
+    document.querySelectorAll('.open-reserve-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            var id = this.getAttribute('data-id');
+            var name = this.getAttribute('data-name');
+            var price = this.getAttribute('data-price');
+            var tipo = this.getAttribute('data-tipo') || '';
+
+            document.getElementById('res-room').value = id;
+            document.getElementById('res-name').value = name || '';
+            document.getElementById('res-price').value = price;
+            if (tipo) {
+                // seleccionar tipo si coincide
+                var sel = document.getElementById('res-room-type');
+                for (var i=0;i<sel.options.length;i++){
+                    if (sel.options[i].value.toLowerCase() === tipo.toLowerCase()){
+                        sel.selectedIndex = i; break;
+                    }
+                }
+            }
+            reserveModal.show();
+        });
+    });
+
+    // si cambia tipo de habitación, actualizar precio (puede ampliarse para mapear precios)
+    document.getElementById('res-room-type').addEventListener('change', function(){
+        // por ahora, simplemente mantenemos el precio original (se puede ajustar según reglas)
+        // placeholder para lógica de precios por tipo
+        // document.getElementById('res-price').value = computedPrice;
+    });
+
+    // enviar formulario por AJAX
+    document.getElementById('reserveForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        var form = e.target;
+        var data = new FormData(form);
+        // añadir campos por defecto de fechas / personas si no existen
+        if (!data.has('checkin')) data.append('checkin', new Date().toISOString().slice(0,10));
+        if (!data.has('checkout')) data.append('checkout', new Date().toISOString().slice(0,10));
+        if (!data.has('adults')) data.append('adults', 1);
+        if (!data.has('children')) data.append('children', 0);
+        if (!data.has('email')) data.append('email', '');
+
+        fetch('php/reservar.php', {
+            method: 'POST',
+            body: data
+        }).then(function(res){ return res.json(); }).then(function(json){
+            if (json && json.success){
+                alert('Reserva confirmada — ID: ' + (json.id || 'N/A'));
+                reserveModal.hide();
+            } else {
+                alert('Error: ' + (json.message || 'No se pudo completar la reserva'));
+            }
+        }).catch(function(err){
+            console.error(err);
+            alert('Error de red al enviar la reserva');
+        });
+    });
+});
+</script>
 </body>
 </html>
 

@@ -249,18 +249,19 @@ if ($action == 'edit' && $id > 0) {
             </a>
         </div>
         <hr class="text-white">
+        <?php $current_action = isset($action) ? $action : 'habitaciones'; ?>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link active" href="admin_habitaciones.php?action=habitaciones"><i class="bi bi-house-door me-2"></i> Habitaciones</a>
+                <a class="nav-link <?php echo ($current_action == 'habitaciones') ? 'active' : ''; ?>" href="admin_habitaciones.php?action=habitaciones"><i class="bi bi-house-door me-2"></i> Habitaciones</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="admin_habitaciones.php?action=reservas"><i class="bi bi-calendar-check me-2"></i> Reservas</a>
+                <a class="nav-link <?php echo ($current_action == 'reservas') ? 'active' : ''; ?>" href="admin_habitaciones.php?action=reservas"><i class="bi bi-calendar-check me-2"></i> Reservas</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="admin_habitaciones.php?action=usuarios"><i class="bi bi-people me-2"></i> Usuarios</a>
+                <a class="nav-link <?php echo ($current_action == 'usuarios') ? 'active' : ''; ?>" href="admin_habitaciones.php?action=usuarios"><i class="bi bi-people me-2"></i> Usuarios</a>
             </li>
             <li class="nav-item mt-4">
-                <a class="nav-link text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión</a>
+                <a class="nav-link text-danger <?php echo ($current_action == 'logout') ? 'active' : ''; ?>" href="#"><i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión</a>
             </li>
         </ul>
     </div>
@@ -325,10 +326,47 @@ if ($action == 'edit' && $id > 0) {
             </div>
 
         <?php elseif ($action == 'usuarios'): ?>
-            <div class="alert alert-info" role="alert">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>No hay usuarios registrados</strong> - Por el momento no hay usuarios registrados en el sistema.
-            </div>
+
+            <?php
+            $result_users = $conn->query("SELECT * FROM usuarios_alborada ORDER BY id DESC");
+            if ($result_users && $result_users->num_rows > 0):
+            ?>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Usuarios registrados</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Correo</th>
+                                        <th>Teléfono</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <?php while ($u = $result_users->fetch_assoc()): ?>
+                                    <?php
+                                        $nombre = htmlspecialchars($u['Nombre'] ?? ($u['fullname'] ?? '—'));
+                                        $correo = htmlspecialchars($u['Correo'] ?? ($u['email'] ?? '—'));
+                                        $telefono = htmlspecialchars($u['Telefono'] ?? ($u['phone'] ?? '—'));
+                                    ?>
+                                    <tr>
+                                        <td><?php echo $nombre; ?></td>
+                                        <td><?php echo $correo; ?></td>
+                                        <td><?php echo $telefono; ?></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>No hay usuarios registrados</strong> - Por el momento no hay usuarios registrados en el sistema.
+                </div>
+            <?php endif; ?>
 
         <?php elseif ($action == 'create' || $action == 'edit'): ?>
 
