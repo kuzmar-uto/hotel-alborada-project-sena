@@ -194,6 +194,7 @@ if ($conn->connect_error) {
                 $caracteristicas = str_replace("\n", "</li>\n<li>", $caracteristicas);
                 $tipo = htmlspecialchars($row['tipo_de_habitacion'] ?? '');
                 $disponibles = isset($row['habitaciones_disponibles']) ? intval($row['habitaciones_disponibles']) : 0;
+                $max = isset($row['max_habitaciones']) ? intval($row['max_habitaciones']) : 0;
             ?>
 
             <div class="col">
@@ -216,7 +217,8 @@ if ($conn->connect_error) {
 
                         <div class="mb-3">
                             <?php if ($disponibles > 0): ?>
-                                <small class="text-success"><i class="bi bi-check-circle"></i> <?= $disponibles ?> disponible(s)</small>
+                                <small class="text-success"><i class="bi bi-check-circle"></i> <?= $disponibles ?> disponible(s)
+                                    <?php if($max > 0): ?> / <?= $max ?> total<?php endif; ?></small>
                             <?php else: ?>
                                 <small class="text-danger"><i class="bi bi-x-circle"></i> Sin disponibilidad</small>
                             <?php endif; ?>
@@ -242,6 +244,7 @@ if ($conn->connect_error) {
                                     data-name="<?= htmlspecialchars($row['nombre']) ?>"
                                     data-price="<?= number_format($row['precio'], 2, '.', '') ?>"
                                     data-tipo="<?= htmlspecialchars($tipo) ?>"
+                                    data-max="<?= $max ?>"
                                     <?= $disponibles == 0 ? 'disabled' : '' ?>>
                                 <?= $disponibles > 0 ? 'Reservar ahora' : 'No disponible' ?>
                             </button>

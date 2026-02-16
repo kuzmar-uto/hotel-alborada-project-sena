@@ -39,6 +39,10 @@ function uploadImage($file) {
 $action = isset($_GET['action']) ? $_GET['action'] : 'habitaciones';
 $id     = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $mensaje = '';
+// permitir pasar mensajes vía query string (ej. después de redirecciones)
+if (isset($_GET['msg'])) {
+    $mensaje = $_GET['msg'];
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre                   = trim($_POST['nombre']);
@@ -46,11 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $precio                   = floatval($_POST['precio']);
     $caracteristicas          = trim($_POST['caracteristicas'] ?? '');
     $disponibles              = intval($_POST['habitaciones_disponibles'] ?? 0);
+    // nuevo campo total/max de habitaciones (se llamará max_habitaciones en la BD)
+    $max_habitaciones         = intval($_POST['max_habitaciones'] ?? 0);
     $imagen                   = isset($_FILES['imagen']) && $_FILES['imagen']['size'] > 0 ? uploadImage($_FILES['imagen']) : null;
 
     if ($action == 'create') {
-        $stmt = $conn->prepare("INSERT INTO habitaciones (nombre, descripcion, caracteristicas, precio, habitaciones_disponibles, imagen) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssdsis", $nombre, $descripcion, $caracteristicas, $precio, $disponibles, $imagen);
+        $stmt = $conn->prepare("INSERT INTO habitaciones (nombre, descripcion, caracteristicas, precio, habitaciones_disponibles, max_habitaciones, imagen) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssdsiis", $nombre, $descripcion, $caracteristicas, $precio, $disponibles, $max_habitaciones, $imagen);
         if ($stmt->execute()) {
             $mensaje = '<div class="alert alert-success">Habitación creada correctamente.</div>';
         } else {
@@ -59,12 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif ($action == 'edit' && $id > 0) {
         if ($imagen) {
             // Nueva imagen → actualizar todo
-            $stmt = $conn->prepare("UPDATE habitaciones SET nombre=?, descripcion=?, caracteristicas=?, precio=?, habitaciones_disponibles=?, imagen=? WHERE id_habitacion=?");
-            $stmt->bind_param("ssdissi", $nombre, $descripcion, $caracteristicas, $precio, $disponibles, $imagen, $id);
+            $stmt = $conn->prepare("UPDATE habitaciones SET nombre=?, descripcion=?, caracteristicas=?, precio=?, habitaciones_disponibles=?, max_habitaciones=?, imagen=? WHERE id_habitacion=?");
+            $stmt->bind_param("ssdsiisi", $nombre, $descripcion, $caracteristicas, $precio, $disponibles, $max_habitaciones, $imagen, $id);
         } else {
             // Mantener imagen anterior
-            $stmt = $conn->prepare("UPDATE habitaciones SET nombre=?, descripcion=?, caracteristicas=?, precio=?, habitaciones_disponibles=? WHERE id_habitacion=?");
-            $stmt->bind_param("ssdisi", $nombre, $descripcion, $caracteristicas, $precio, $disponibles, $id);
+            $stmt = $conn->prepare("UPDATE habitaciones SET nombre=?, descripcion=?, caracteristicas=?, precio=?, habitaciones_disponibles=?, max_habitaciones=? WHERE id_habitacion=?");
+            $stmt->bind_param("ssdisii", $nombre, $descripcion, $caracteristicas, $precio, $disponibles, $max_habitaciones, $id);
         }
         if ($stmt->execute()) {
             $mensaje = '<div class="alert alert-success">Habitación actualizada correctamente.</div>';
@@ -83,6 +89,24 @@ if ($action == 'delete' && $id > 0) {
         $mensaje = '<div class="alert alert-success">Habitación eliminada.</div>';
     } else {
         $mensaje = '<div class="alert alert-danger">Error al eliminar.</div>';
+    }
+}
+
+// Acción para alternar rol de administrador
+if (($action == 'make_admin' || $action == 'remove_admin') && $id > 0) {
+    if ($action == 'make_admin') {
+        $stmt = $conn->prepare("UPDATE usuarios_alborada SET addmin = 1 WHERE id = ?");
+    } else {
+        $stmt = $conn->prepare("UPDATE usuarios_alborada SET addmin = 0 WHERE id = ?");
+    }
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        $msg = ($action == 'make_admin') ? 'Usuario ahora es administrador.' : 'Administrador revocado.';
+        // redirigir a la pestaña usuarios para ver el cambio y evitar resubmits
+        header('Location: admin_habitaciones.php?action=usuarios&msg=' . urlencode('<div class="alert alert-success">' . $msg . '</div>'));
+        exit;
+    } else {
+        $mensaje = '<div class="alert alert-danger">Error al actualizar rol de administrador.</div>';
     }
 }
 
@@ -309,6 +333,7 @@ if ($action == 'edit' && $id > 0) {
                             <h5 class="card-title"><?php echo htmlspecialchars($row['nombre']); ?></h5>
                             <p class="card-text text-muted small"><?php echo nl2br(htmlspecialchars(substr($row['descripcion'], 0, 120))); ?>...</p>
                             <p class="fw-bold text-primary fs-5">$<?php echo number_format($row['precio'], 2); ?></p>
+                            <p class="text-muted small mb-1">Disponibles: <?php echo intval($row['habitaciones_disponibles'] ?? 0); ?><?php if(isset($row['max_habitaciones'])) echo ' / '.intval($row['max_habitaciones']); ?></p>
                             <div class="d-flex gap-2 mt-3">
                                 <a href="?action=edit&id=<?php echo $row['id_habitacion']; ?>" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Editar</a>
                                 <a href="?action=delete&id=<?php echo $row['id_habitacion']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Realmente deseas eliminar esta habitación?');"><i class="bi bi-trash"></i> Eliminar</a>
@@ -341,6 +366,8 @@ if ($action == 'edit' && $id > 0) {
                                         <th>Nombre</th>
                                         <th>Correo</th>
                                         <th>Teléfono</th>
+                                        <th>Admin</th>
+                                        <th>Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -349,11 +376,20 @@ if ($action == 'edit' && $id > 0) {
                                         $nombre = htmlspecialchars($u['Nombre'] ?? ($u['fullname'] ?? '—'));
                                         $correo = htmlspecialchars($u['Correo'] ?? ($u['email'] ?? '—'));
                                         $telefono = htmlspecialchars($u['Telefono'] ?? ($u['phone'] ?? '—'));
+                                        $isAdmin = intval($u['addmin'] ?? 0);
                                     ?>
                                     <tr>
                                         <td><?php echo $nombre; ?></td>
                                         <td><?php echo $correo; ?></td>
                                         <td><?php echo $telefono; ?></td>
+                                        <td><?php echo $isAdmin ? 'Sí' : 'No'; ?></td>
+                                        <td>
+                                            <?php if (!$isAdmin): ?>
+                                                <a href="?action=make_admin&id=<?php echo $u['id']; ?>" class="btn btn-sm btn-outline-primary">Hacer admin</a>
+                                            <?php else: ?>
+                                                <a href="?action=remove_admin&id=<?php echo $u['id']; ?>" class="btn btn-sm btn-outline-secondary">Quitar admin</a>
+                                            <?php endif; ?>
+                                        </td>
                                     </tr>
                                 <?php endwhile; ?>
                                 </tbody>
@@ -392,6 +428,12 @@ if ($action == 'edit' && $id > 0) {
                             <label class="form-label fw-bold">Habitaciones Disponibles</label>
                             <input type="number" min="0" name="habitaciones_disponibles" class="form-control" value="<?php echo $habitacion ? intval($habitacion['habitaciones_disponibles'] ?? 0) : 0; ?>" required>
                             <div class="form-text">Cantidad de habitaciones de este tipo disponibles para reservar.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Total de habitaciones</label>
+                            <input type="number" min="0" name="max_habitaciones" class="form-control" value="<?php echo $habitacion ? intval($habitacion['max_habitaciones'] ?? 0) : 0; ?>" required>
+                            <div class="form-text">Número máximo o total de habitaciones de este tipo (se usa para cálculo avanzado).</div>
                         </div>
 
                         <div class="mb-3">
