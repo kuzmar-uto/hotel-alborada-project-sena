@@ -21,6 +21,10 @@ $name = isset($_POST['name']) ? trim($_POST['name']) : '';
 $adults = isset($_POST['adults']) ? (int) $_POST['adults'] : 0;
 $children = isset($_POST['children']) ? (int) $_POST['children'] : 0;
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+// nuevos campos
+$documento_tipo = isset($_POST['documento_tipo']) ? trim($_POST['documento_tipo']) : '';
+$documento_numero = isset($_POST['documento_numero']) ? trim($_POST['documento_numero']) : '';
+$tipo_habitacion = isset($_POST['tipo_habitacion']) ? trim($_POST['tipo_habitacion']) : '';
 
 // validación básica
 if (!$room || !$checkin || !$checkout || !$name || !$email) {
@@ -41,6 +45,9 @@ try {
         id INT AUTO_INCREMENT PRIMARY KEY,
         room VARCHAR(255) NOT NULL,
         price VARCHAR(50) DEFAULT NULL,
+        documento_tipo VARCHAR(50) DEFAULT NULL,
+        documento_numero VARCHAR(100) DEFAULT NULL,
+        tipo_habitacion VARCHAR(50) DEFAULT NULL,
         checkin DATE NOT NULL,
         checkout DATE NOT NULL,
         guest_name VARCHAR(255) NOT NULL,
@@ -51,9 +58,12 @@ try {
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
     $conn->exec($sqlCreate);
 
-    $stmt = $conn->prepare('INSERT INTO reservas (room, price, checkin, checkout, guest_name, adults, children, email) VALUES (:room, :price, :checkin, :checkout, :guest_name, :adults, :children, :email)');
+    $stmt = $conn->prepare('INSERT INTO reservas (room, price, documento_tipo, documento_numero, tipo_habitacion, checkin, checkout, guest_name, adults, children, email) VALUES (:room, :price, :documento_tipo, :documento_numero, :tipo_habitacion, :checkin, :checkout, :guest_name, :adults, :children, :email)');
     $stmt->bindParam(':room', $room);
     $stmt->bindParam(':price', $price);
+    $stmt->bindParam(':documento_tipo', $documento_tipo);
+    $stmt->bindParam(':documento_numero', $documento_numero);
+    $stmt->bindParam(':tipo_habitacion', $tipo_habitacion);
     $stmt->bindParam(':checkin', $checkin);
     $stmt->bindParam(':checkout', $checkout);
     $stmt->bindParam(':guest_name', $name);

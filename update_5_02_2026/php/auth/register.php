@@ -49,31 +49,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Hash de la contraseña
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // Insertar nuevo usuario en usuarios_alborada
-        $insertQuery = "INSERT INTO usuarios_alborada (Correo, Contraseña) 
-                       VALUES (:email, :password)";
+        // Asegurar que las columnas Nombre y Telefono existan (MySQL 8+ soporta IF NOT EXISTS)
+        try {
+            $db->exec("ALTER TABLE usuarios_alborada ADD COLUMN IF NOT EXISTS Nombre VARCHAR(255) DEFAULT NULL");
+            $db->exec("ALTER TABLE usuarios_alborada ADD COLUMN IF NOT EXISTS Telefono VARCHAR(50) DEFAULT NULL");
+        } catch (PDOException $e) {
+            // Si ALTER falla por versión de MySQL, ignoramos—la inserción intentará usar las columnas existentes.
+        }
+
+        // Insertar nuevo usuario en usuarios_alborada (incluyendo nombre y teléfono si existen)
+        $insertQuery = "INSERT INTO usuarios_alborada (Correo, Contraseña, Nombre, Telefono) 
+                       VALUES (:email, :password, :fullname, :phone)";
         
         $insertStmt = $db->prepare($insertQuery);
         $insertStmt->bindParam(':email', $email);
         $insertStmt->bindParam(':password', $hashed_password);
+        $insertStmt->bindParam(':fullname', $fullname);
+        $insertStmt->bindParam(':phone', $phone);
 
-        if ($insertStmt->execute()) {
-            // Obtener el ID del nuevo usuario
-            $usuario_id = $db->lastInsertId();
-            
-            // Iniciar sesión automáticamente después del registro
-            $_SESSION['usuario_id'] = $usuario_id;
-            $_SESSION['usuario_email'] = $email;
-            $_SESSION['usuario_nombre'] = $fullname;
-            $_SESSION['logged_in'] = true;
+        try {
+            if ($insertStmt->execute()) {
+                // Obtener el ID del nuevo usuario
+                $usuario_id = $db->lastInsertId();
 
-            echo json_encode([
-                'success' => true, 
-                'message' => '¡Registro exitoso! Bienvenido a Alborada Hotel.',
-                'redirect' => 'dashboard.php'
-            ]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error al crear la cuenta. Intenta nuevamente.']);
+                // Iniciar sesión automáticamente después del registro
+                $_SESSION['usuario_id'] = $usuario_id;
+                $_SESSION['usuario_email'] = $email;
+                $_SESSION['usuario_nombre'] = $fullname;
+                $_SESSION['usuario_telefono'] = $phone;
+                $_SESSION['logged_in'] = true;
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => '¡Registro exitoso! Bienvenido a Alborada Hotel.',
+                    'redirect' => 'dashboard.php'
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al crear la cuenta. Intenta nuevamente.']);
+            }
+        } catch (PDOException $e) {
+            // Si falló por ausencia de columnas Nombre/Telefono, intentar insertar solo correo/contraseña
+            try {
+                $insertQuery2 = "INSERT INTO usuarios_alborada (Correo, Contraseña) VALUES (:email, :password)";
+                $insertStmt2 = $db->prepare($insertQuery2);
+                $insertStmt2->bindParam(':email', $email);
+                $insertStmt2->bindParam(':password', $hashed_password);
+                if ($insertStmt2->execute()) {
+                    $usuario_id = $db->lastInsertId();
+                    $_SESSION['usuario_id'] = $usuario_id;
+                    $_SESSION['usuario_email'] = $email;
+                    $_SESSION['usuario_nombre'] = $fullname;
+                    $_SESSION['logged_in'] = true;
+                    echo json_encode([
+                        'success' => true,
+                        'message' => '¡Registro exitoso! Bienvenido a Alborada Hotel.',
+                        'redirect' => 'dashboard.php'
+                    ]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error al crear la cuenta. Intenta nuevamente.']);
+                }
+            } catch (PDOException $e2) {
+                throw $e2; // será atrapado por el catch externo
+            }
         }
 
     } catch (PDOException $exception) {

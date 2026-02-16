@@ -87,7 +87,7 @@ try {
         <?php endif; ?>
 
         <?php if (empty($reservas)): ?>
-            <div style="padding:14px;background:#fff;border-radius:8px">No se encontraron reservas.</div>
+            <div style="padding:14px;background:#fff;border-radius:8px">No se encuentran .</div>
         <?php else: ?>
             <table>
                 <thead>
