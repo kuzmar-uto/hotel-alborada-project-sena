@@ -119,6 +119,31 @@ if ($action == 'edit' && $id > 0) {
     $result = $stmt->get_result();
     $habitacion = $result->fetch_assoc();
 }
+
+// cargar reservas si estamos en la pestaña correspondiente
+$reservas = [];
+if ($action == 'reservas') {
+    // asegurarse de que la tabla tenga las columnas necesarias
+    $alterSqls = [
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS id_habitacion VARCHAR(255) NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS fecha_entrada DATE NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS fecha_salida DATE NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS nombre_completo VARCHAR(255) NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS adultos INT DEFAULT 0",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS ninos INT DEFAULT 0",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS email VARCHAR(255) NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+    ];
+    foreach ($alterSqls as $a) {
+        @$conn->query($a); // ignorar errores
+    }
+
+    // if the table doesn't have its own auto-increment id, skip it
+    $resQuery = $conn->query("SELECT id_habitacion, fecha_entrada, fecha_salida, nombre_completo, adultos, ninos, email, fecha_registro FROM reservas ORDER BY fecha_registro DESC");
+    if ($resQuery) {
+        $reservas = $resQuery->fetch_all(MYSQLI_ASSOC);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -345,10 +370,43 @@ if ($action == 'edit' && $id > 0) {
             </div>
 
         <?php elseif ($action == 'reservas'): ?>
-            <div class="alert alert-info" role="alert">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>No hay reservas</strong> - Por el momento no hay reservas registradas en el sistema.
-            </div>
+            <?php if (empty($reservas)): ?>
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>No hay reservas</strong> - Por el momento no hay reservas registradas en el sistema.
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID Habitación</th>
+                                <th>Entrada</th>
+                                <th>Salida</th>
+                                <th>Nombre completo</th>
+                                <th>Adultos</th>
+                                <th>Niños</th>
+                                <th>Email</th>
+                                <th>Registro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($reservas as $r): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($r['id_habitacion']) ?></td>
+                                    <td><?= htmlspecialchars($r['fecha_entrada']) ?></td>
+                                    <td><?= htmlspecialchars($r['fecha_salida']) ?></td>
+                                    <td><?= htmlspecialchars($r['nombre_completo']) ?></td>
+                                    <td><?= htmlspecialchars($r['adultos']) ?></td>
+                                    <td><?= htmlspecialchars($r['ninos']) ?></td>
+                                    <td><?= htmlspecialchars($r['email']) ?></td>
+                                    <td><?= htmlspecialchars($r['fecha_registro']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
 
         <?php elseif ($action == 'usuarios'): ?>
 

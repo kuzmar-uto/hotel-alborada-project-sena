@@ -243,7 +243,11 @@ if ($conn->connect_error) {
                                     data-id="<?= $row['id_habitacion'] ?>"
                                     data-name="<?= htmlspecialchars($row['nombre']) ?>"
                                     data-price="<?= number_format($row['precio'], 2, '.', '') ?>"
+                                    data-desc="<?= htmlspecialchars($row['descripcion']) ?>"
+                                    data-img="<?= htmlspecialchars($img) ?>"
+                                    data-caracs="<?= htmlspecialchars($row['caracteristicas']) ?>"
                                     data-tipo="<?= htmlspecialchars($tipo) ?>"
+                                    data-disponibles="<?= $disponibles ?>"
                                     data-max="<?= $max ?>"
                                     <?= $disponibles == 0 ? 'disabled' : '' ?>>
                                 <?= $disponibles > 0 ? 'Reservar ahora' : 'No disponible' ?>
@@ -270,7 +274,7 @@ if ($conn->connect_error) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Reserva Modal -->
-<div class="modal fade" id="reserveModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade reserve-modal" id="reserveModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:12px;overflow:hidden;">
             <div class="modal-header" style="background:linear-gradient(90deg,var(--primary),var(--primary-dark));color:white;border-bottom:none;">
@@ -278,38 +282,53 @@ if ($conn->connect_error) {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body p-4">
+                <!-- preview of room for user reassurance -->
+                <div class="room-preview mb-3">
+                    <img id="res-room-img" src="" alt="Imagen habitación">
+                    <h5 id="res-room-name-display"></h5>
+                    <p id="res-room-desc-display" class="small text-muted"></p>
+                    <p id="res-room-features-display" class="small"></p>
+                    <p id="res-room-availability" class="small"></p>
+                </div>
                 <form id="reserveForm">
-                    <input type="hidden" name="room" id="res-room">
+                    <input type="hidden" name="id_habitacion" id="res-room">
+                    <input type="hidden" name="room_name" id="res-room-name">
+                    <input type="hidden" name="room_desc" id="res-room-desc">
+                    <input type="hidden" name="room_price" id="res-room-price">
+                    <input type="hidden" name="room_img" id="res-room-img-hidden">
+                    <input type="hidden" name="room_caracs" id="res-room-caracs">
+                    <input type="hidden" name="room_tipo" id="res-room-tipo">
+                    <input type="hidden" name="room_disponibles" id="res-room-disponibles">
+                    <input type="hidden" name="room_max" id="res-room-max">
 
                     <div class="mb-3">
-                        <label class="form-label">Tipo de documento</label>
-                        <select class="form-select" name="documento_tipo" id="res-doc-type" required>
-                            <option value="tarjeta_identidad">Tarjeta de identidad</option>
-                            <option value="cedula">Cédula</option>
-                        </select>
+                        <label class="form-label">Fecha de entrada</label>
+                        <input type="date" name="fecha_entrada" id="res-fecha-entrada" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Número de documento</label>
-                        <input type="text" name="documento_numero" id="res-doc-number" class="form-control" pattern="\d+" inputmode="numeric" required>
+                        <label class="form-label">Fecha de salida</label>
+                        <input type="date" name="fecha_salida" id="res-fecha-salida" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Tipo de habitación</label>
-                        <select class="form-select" name="tipo_habitacion" id="res-room-type" required>
-                            <option value="sencilla">Sencilla</option>
-                            <option value="doble">Doble</option>
-                        </select>
+                        <label class="form-label">Nombre completo</label>
+                        <input type="text" name="nombre_completo" id="res-nombre" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Precio por noche</label>
-                        <input type="text" name="price" id="res-price" class="form-control" readonly>
+                        <label class="form-label">Adultos</label>
+                        <input type="number" name="adultos" id="res-adultos" class="form-control" min="0" value="1" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Nombre del titular</label>
-                        <input type="text" name="name" id="res-name" class="form-control" required>
+                        <label class="form-label">Niños</label>
+                        <input type="number" name="ninos" id="res-ninos" class="form-control" min="0" value="0" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Correo electrónico</label>
+                        <input type="email" name="email" id="res-email" class="form-control" required>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2">
@@ -330,30 +349,64 @@ document.addEventListener('DOMContentLoaded', function(){
         btn.addEventListener('click', function(){
             var id = this.getAttribute('data-id');
             var name = this.getAttribute('data-name');
-            var price = this.getAttribute('data-price');
-            var tipo = this.getAttribute('data-tipo') || '';
+            var desc = this.getAttribute('data-desc') || '';
+            var img = this.getAttribute('data-img') || '';
+            var caracs = this.getAttribute('data-caracs') || '';
+            var disponibles = this.getAttribute('data-disponibles') || '';
+            var max = this.getAttribute('data-max') || '';
 
+            // hidden inputs
             document.getElementById('res-room').value = id;
-            document.getElementById('res-name').value = name || '';
-            document.getElementById('res-price').value = price;
-            if (tipo) {
-                // seleccionar tipo si coincide
-                var sel = document.getElementById('res-room-type');
-                for (var i=0;i<sel.options.length;i++){
-                    if (sel.options[i].value.toLowerCase() === tipo.toLowerCase()){
-                        sel.selectedIndex = i; break;
-                    }
-                }
+            document.getElementById('res-room-name').value = name;
+            document.getElementById('res-room-desc').value = desc;
+            document.getElementById('res-room-price').value = '';
+            document.getElementById('res-room-img-hidden').value = img;
+            document.getElementById('res-room-caracs').value = caracs;
+            document.getElementById('res-room-tipo').value = '';
+            document.getElementById('res-room-disponibles').value = disponibles;
+            document.getElementById('res-room-max').value = max;
+
+            // update visible preview
+            document.getElementById('res-room-name-display').textContent = name || '';
+            document.getElementById('res-room-desc-display').textContent = desc || '';
+            document.getElementById('res-room-features-display').textContent = caracs || '';
+            document.getElementById('res-room-img').src = img || 'https://via.placeholder.com/800x600/cccccc/ffffff?text=Habitaci%C3%B3n';
+            var availTxt = '';
+            if (disponibles) {
+                availTxt = disponibles + ' disponible(s)';
+                if (max) availTxt += ' / ' + max + ' total';
+            } else {
+                availTxt = 'Sin disponibilidad';
             }
+            document.getElementById('res-room-availability').textContent = availTxt;
+
+            // clear / set reservation input defaults
+            var today = new Date().toISOString().slice(0,10);
+            document.getElementById('res-fecha-entrada').value = today;
+            // salida mínimo = entrada + 1 día
+            var nextDay = new Date(); nextDay.setDate(nextDay.getDate()+1);
+            document.getElementById('res-fecha-salida').min = nextDay.toISOString().slice(0,10);
+            document.getElementById('res-fecha-salida').value = nextDay.toISOString().slice(0,10);
+            document.getElementById('res-nombre').value = '';
+            document.getElementById('res-adultos').value = 1;
+            document.getElementById('res-ninos').value = 0;
+            document.getElementById('res-email').value = '';
+
             reserveModal.show();
         });
     });
 
-    // si cambia tipo de habitación, actualizar precio (puede ampliarse para mapear precios)
-    document.getElementById('res-room-type').addEventListener('change', function(){
-        // por ahora, simplemente mantenemos el precio original (se puede ajustar según reglas)
-        // placeholder para lógica de precios por tipo
-        // document.getElementById('res-price').value = computedPrice;
+
+    // enforce salida >= entrada +1 when entrada changes
+    document.getElementById('res-fecha-entrada').addEventListener('change', function(){
+        var ent = this.value;
+        if (!ent) return;
+        var d = new Date(ent);
+        d.setDate(d.getDate()+1);
+        var min = d.toISOString().slice(0,10);
+        var salidaEl = document.getElementById('res-fecha-salida');
+        salidaEl.min = min;
+        if (salidaEl.value < min) salidaEl.value = min;
     });
 
     // enviar formulario por AJAX
@@ -361,12 +414,7 @@ document.addEventListener('DOMContentLoaded', function(){
         e.preventDefault();
         var form = e.target;
         var data = new FormData(form);
-        // añadir campos por defecto de fechas / personas si no existen
-        if (!data.has('checkin')) data.append('checkin', new Date().toISOString().slice(0,10));
-        if (!data.has('checkout')) data.append('checkout', new Date().toISOString().slice(0,10));
-        if (!data.has('adults')) data.append('adults', 1);
-        if (!data.has('children')) data.append('children', 0);
-        if (!data.has('email')) data.append('email', '');
+        // no se necesitan campos adicionales, ya los tiene
 
         fetch('php/reservar.php', {
             method: 'POST',
