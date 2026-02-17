@@ -6,7 +6,23 @@ $conn = $db->getConnection();
 
 // obtener reservas
 try {
-    $stmt = $conn->prepare('SELECT id, room, price, checkin, checkout, guest_name, adults, children, email, created_at FROM reservas ORDER BY created_at DESC');
+    // garantizamos que existan las columnas en tablas antiguas
+    $alterSqls = [
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS id_habitacion VARCHAR(255) NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS fecha_entrada DATE NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS fecha_salida DATE NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS nombre_completo VARCHAR(255) NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS adultos INT DEFAULT 0",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS ninos INT DEFAULT 0",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS email VARCHAR(255) NOT NULL",
+        "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+    ];
+    foreach ($alterSqls as $a) {
+        try { $conn->exec($a); } catch (PDOException $ignored) {}
+    }
+
+    // select the Spanish-named reservation columns
+    $stmt = $conn->prepare('SELECT id, id_habitacion, fecha_entrada, fecha_salida, nombre_completo, adultos, ninos, email, fecha_registro FROM reservas ORDER BY fecha_registro DESC');
     $stmt->execute();
     $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -93,30 +109,28 @@ try {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Habitación</th>
-                        <th>Precio</th>
+                        <th>ID Habitación</th>
                         <th>Entrada</th>
                         <th>Salida</th>
-                        <th>Huésped</th>
+                        <th>Nombre completo</th>
                         <th>Adultos</th>
                         <th>Niños</th>
                         <th>Email</th>
-                        <th>Creada</th>
+                        <th>Registro</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($reservas as $r): ?>
                         <tr>
                             <td><?= htmlspecialchars($r['id']) ?></td>
-                            <td><?= htmlspecialchars($r['room']) ?></td>
-                            <td><?= htmlspecialchars($r['price']) ?></td>
-                            <td><?= htmlspecialchars($r['checkin']) ?></td>
-                            <td><?= htmlspecialchars($r['checkout']) ?></td>
-                            <td><?= htmlspecialchars($r['guest_name']) ?></td>
-                            <td><?= htmlspecialchars($r['adults']) ?></td>
-                            <td><?= htmlspecialchars($r['children']) ?></td>
+                            <td><?= htmlspecialchars($r['id_habitacion']) ?></td>
+                            <td><?= htmlspecialchars($r['fecha_entrada']) ?></td>
+                            <td><?= htmlspecialchars($r['fecha_salida']) ?></td>
+                            <td><?= htmlspecialchars($r['nombre_completo']) ?></td>
+                            <td><?= htmlspecialchars($r['adultos']) ?></td>
+                            <td><?= htmlspecialchars($r['ninos']) ?></td>
                             <td><?= htmlspecialchars($r['email']) ?></td>
-                            <td><?= htmlspecialchars($r['created_at']) ?></td>
+                            <td><?= htmlspecialchars($r['fecha_registro']) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
