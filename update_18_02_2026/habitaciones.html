@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habitaciones</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --bg: #f6f7f9;
+            --surface: #ffffff;
+            --accent: #4197aa;
+            --muted: #626e75;
+            --text: #24303a;
+            --topbar: #2f3337;
+            --card-shadow: 0 8px 24px rgba(36, 48, 58, 0.08);
+            --radius: 12px;
+            --container: 1100px;
+            --transition: 200ms ease;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6
+        }
+
+        /* Header & Topbar basic styles (overrides from styles.css if needed) */
+        #top-bar {
+            background: var(--topbar);
+            /* usar gris oscuro definido en :root */
+            color: #fff;
+            padding: 8px 0;
+            font-size: 14px
+        }
+
+        #top-bar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        header {
+            background: var(--topbar);
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 1000
+        }
+
+        .container {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 1rem
+        }
+
+        /* Room cards fallback styles (will be overwritten by inline styles lower in file) */
+        .room-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem
+        }
+
+        /* Force Mi Cuenta button yellow on this page (override local --accent) */
+        .btn-account {
+            background-color: #ffd500 !important;
+            /* amarillo */
+            color: #111111 !important;
+            /* texto negro */
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: none !important;
+        }
+
+        .btn-account:hover {
+            background-color: #e0c200 !important;
+            transform: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Bar removed -->
+
+    <header>
+        <div class="container">
+            <div id="main-header">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="https://alboradahotel.com/wp-content/uploads/2023/09/Alborada-Original-en-MELGAR-hoteles-en-melgar.png"
+                            alt="Alborada Hotel Melgar">
+                    </a>
+                </div>
+                <nav>
+                    <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+                    <ul>
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="index.html#about">Nosotros</a></li>
+                        <li><a href="habitaciones.html">Habitaciones</a></li>
+                        <li><a href="index.html#services">Servicios</a></li>
+                        <li><a href="index.html#contact">Contacto</a></li>
+                        <li><a href="cuenta.html" class="btn btn-account"
+                                style="background:#ffd500;color:#111;border:1px solid rgba(0,0,0,0.08);">Mi Cuenta</a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="overlay"></div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="room-card" aria-labelledby="r1-title">
+                <div class="room-info">
+                    <h2 id="r1-title" class="room-title">Habitación doble</h2>
+                    <p class="room-desc">Perfecta para dos huéspedes, equipada con dos camas semidobles y todas las
+                        comodidades necesarias.</p>
+                    <ul class="room-features">
+                        <li>2 camas semidobles</li>
+                        <li>Televisión Smart TV</li>
+                        <li>WiFi de alta velocidad</li>
+                        <li>Baño privado</li>
+                    </ul>
+                    <button class="btn reserve-btn" type="button" data-room="Habitación doble" data-price="180"
+                        aria-label="Reservar habitación doble">Reservar</button>
+                </div>
+                <div class="room-side">
+                    <img src="https://alboradahotel.com/wp-content/uploads/2023/09/HOTEL-EN-MELGAR-ALBORADA-HOTEL-8.jpg"
+                        loading="lazy" class="room-img" alt="Habitación doble" onclick="openLightbox(this.src)">
+                    <div style="text-align:center">
+                        <div class="price">$ 180 <small style="color:var(--muted);font-weight:500">por noche</small>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="room-card" aria-labelledby="r2-title">
+                <div class="room-info">
+                    <h2 id="r2-title" class="room-title">Habitación premium</h2>
+                    <p class="room-desc">Una habitación amplia con cama doble y vista preferencial.</p>
+                    <ul class="room-features">
+                        <li>Cama king</li>
+                        <li>Vista panorámica</li>
+                        <li>Televisión 50"</li>
+                        <li>Baño con agua caliente</li>
+                    </ul>
+                    <button class="btn reserve-btn" type="button" data-room="Habitación premium" data-price="260"
+                        aria-label="Reservar habitación premium">Reservar</button>
+                </div>
+                <div class="room-side">
+                    <img src="https://alboradahotel.com/wp-content/uploads/2023/09/HOTEL-EN-MELGAR-ALBORADA-HOTEL-3.jpg"
+                        loading="lazy" class="room-img" alt="Habitación premium" onclick="openLightbox(this.src)">
+                    <div style="text-align:center">
+                        <div class="price">$ 260 <small style="color:var(--muted);font-weight:500">por noche</small>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <span id="closeBtn">×</span>
+        <img id="lightboxImage" />
+    </div>
+
+    <script>
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImage');
+        const closeBtn = document.getElementById('closeBtn');
+
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            lightboxImg.src = '';
+            document.body.style.overflow = '';
+        }
+
+        // cerrar al hacer click fuera de la imagen
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox || e.target === closeBtn) closeLightbox();
+        });
+
+        // evitar que el click en la imagen cierre el lightbox
+        lightboxImg.addEventListener('click', (e) => e.stopPropagation());
+
+        closeBtn.addEventListener('click', closeLightbox);
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+    <!-- RESERVATION MODAL -->
+    <!-- RESERVATION MODAL -->
+    <div id="reserveModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <button id="modalClose" class="modal-close" aria-label="Cerrar">×</button>
+            <h3 id="modalTitle">Reservar habitación</h3>
+            <form id="reserveForm">
+                <div class="modal-form-grid">
+                    <div class="field full">
+                        <label>Habitación</label>
+                        <input type="text" id="roomInput" name="room" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Fecha entrada</label>
+                        <input type="date" id="checkin" name="checkin" required>
+                    </div>
+                    <div class="field">
+                        <label>Fecha salida</label>
+                        <input type="date" id="checkout" name="checkout" required>
+                    </div>
+                    <div class="field full">
+                        <label>Nombre completo</label>
+                        <input type="text" id="guestName" name="name" required>
+                    </div>
+                    <div class="field">
+                        <label>Adultos</label>
+                        <input type="number" id="adults" name="adults" min="1" required>
+                    </div>
+                    <div class="field">
+                        <label>Niños</label>
+                        <input type="number" id="children" name="children" min="0">
+                    </div>
+                    <div class="field full">
+                        <label>Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn">Confirmar reserva</button>
+                    <button type="button" id="modalCancel" class="btn secondary">Cancelar</button>
+                </div>
+                <div id="reserveMsg" style="margin-top:.6rem;color:var(--muted);font-size:.95rem"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="paymentModal" class="modal payment-modal" aria-hidden="true">
+        <div class="modal-backdrop" id="paymentBackdrop"></div>
+        <div class="modal-panel payment-panel" role="dialog" aria-modal="true">
+            <button id="paymentClose" class="modal-close" aria-label="Cerrar">×</button>
+            <div class="payment-header">
+                <h3>Elige tu método de pago</h3>
+                <p>Selecciona cómo deseas pagar tu reserva</p>
+            </div>
+            
+            <div class="payment-methods">
+                <div class="payment-option" data-method="nequi">
+                    <div class="payment-icon">
+                        <img src="https://i.pinimg.com/564x/56/62/57/566257ad4944e5561a708fbdf6222d2e.jpg" alt="Nequi" class="payment-logo" style="width:48px;height:auto;" onerror="this.style.display='none'" />
+                    </div>
+                    <h4>NEQUI</h4>
+                    <p>Paga directamente desde tu móvil</p>
+                    <span class="check-mark">✓</span>
+                </div>
+
+                <div class="payment-option" data-method="paypal">
+                    <div class="payment-icon">
+                        <i class="fab fa-paypal"></i>
+                    </div>
+                    <h4>PayPal</h4>
+                    <p>Paga de forma segura con PayPal</p>
+                    <span class="check-mark">✓</span>
+                </div>
+            </div>
+
+            <div class="payment-actions">
+                <button id="confirmPayment" class="btn">Continuar con el pago</button>
+                <button id="cancelPayment" class="btn secondary">Volver</button>
+            </div>
+
+            <div id="paymentMsg" style="margin-top:.6rem;color:var(--muted);font-size:.95rem;text-align:center"></div>
+        </div>
+    </div>
+
+    <!-- PAYMENT CONFIRMATION MODAL -->
+    <div id="confirmPaymentModal" class="modal payment-confirmation-modal" aria-hidden="true">
+        <div class="modal-backdrop" id="confirmPaymentBackdrop"></div>
+        <div class="modal-panel confirmation-panel" role="dialog" aria-modal="true">
+            <button id="confirmPaymentClose" class="modal-close" aria-label="Cerrar">×</button>
+            
+            <div class="confirmation-header">
+                <div class="payment-method-badge" id="methodBadge">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Completar Pago</h3>
+            </div>
+
+            <div class="reservation-summary">
+                <div class="summary-item">
+                    <span class="summary-label">Habitación:</span>
+                    <span class="summary-value" id="summaryRoom">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Entrada:</span>
+                    <span class="summary-value" id="summaryCheckin">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Salida:</span>
+                    <span class="summary-value" id="summaryCheckout">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Huéspedes:</span>
+                    <span class="summary-value" id="summaryGuests">-</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-item total">
+                    <span class="summary-label">Total a pagar:</span>
+                    <span class="summary-value" id="summaryTotal">$ 0.00</span>
+                </div>
+            </div>
+
+            <form id="paymentForm" class="payment-form" novalidate>
+                <div class="payment-form-content">
+                    <!-- Campo dinámico según método de pago -->
+                    <div class="form-group" id="nequiGroup" style="display: none;">
+                        <div class="bank-logo">
+                            <img src="https://images.seeklogo.com/logo-png/40/2/nequi-logo-png_seeklogo-404357.png" alt="Nequi" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23FF6B00%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2260%22 font-size=%2240%22 fill=%22white%22 text-anchor=%22middle%22 font-weight=%22bold%22%3EN%3C/text%3E%3C/svg%3E'" />
+                        </div>
+                        <label for="nequiPhone">Número de teléfono Nequi</label>
+                        <div class="input-group">
+                            <span class="input-prefix">+57</span>
+                            <input type="tel" id="nequiPhone" name="nequiPhone" class="form-control" 
+                                   placeholder="Ej: 3001234567" maxlength="10" pattern="[0-9]{10}" required>
+                        </div>
+                        <small>Ingresa tu número sin el código de país. Serás redirigido a Nequi al completar.</small>
+                    </div>
+
+                    <div class="form-group" id="paypalGroup" style="display: none;">
+                        <div class="bank-logo">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3992/3992563.png" alt="PayPal" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23003087%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2240%22 fill=%22white%22 text-anchor=%22middle%22 font-weight=%22bold%22%3EP%3C/text%3E%3C/svg%3E'" />
+                        </div>
+                        <label for="paypalEmail">Correo PayPal</label>
+                        <input type="email" id="paypalEmail" name="paypalEmail" class="form-control" 
+                               placeholder="tu@email.com" required>
+                        <small>Serás redirigido a PayPal al completar el formulario.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="confirmTerms" name="confirmTerms" required>
+                            Confirmo que los datos son correctos y autorizo el pago
+                        </label>
+                    </div>
+                </div>
+
+                <div class="payment-actions">
+                    <button type="submit" class="btn" id="submitPayment">Procesar Pago</button>
+                    <button type="button" id="backToPayment" class="btn secondary">Volver</button>
+                </div>
+
+                <div id="confirmMsg" style="margin-top:.8rem;color:var(--muted);font-size:.9rem;text-align:center"></div>
+            </form>
+
+            <div class="payment-security">
+                <i class="fas fa-lock"></i>
+                <span>Transacción segura y encriptada</span>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 12000
+        }
+
+        .modal[aria-hidden="false"] {
+            display: block
+        }
+
+        .modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45)
+        }
+
+        .modal-panel {
+            position: relative;
+            background: var(--surface);
+            width: 420px;
+            max-width: 94%;
+            margin: auto;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 10px;
+            padding: 1rem 1.1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
+            margin: 30px 0;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 10px;
+            top: 6px;
+            border: none;
+            background: transparent;
+            font-size: 26px;
+            color: var(--muted);
+            cursor: pointer
+        }
+
+        .modal-panel h3 {
+            margin: 0 0 .5rem;
+            font-size: 1.1rem
+        }
+
+        .field {
+            margin-bottom: .6rem
+        }
+
+        .field label {
+            display: block;
+            font-size: .85rem;
+            color: var(--muted);
+            margin-bottom: .25rem
+        }
+
+        .field input {
+            width: 100%;
+            padding: .5rem;
+            border-radius: 8px;
+            border: 1px solid #e6e9ec
+        }
+
+        .field.half {
+            display: inline-block;
+            width: calc(50% - .35rem)
+        }
+
+        .field.half+.field.half {
+            margin-left: .7rem
+        }
+
+        /* Modal action buttons: center and smaller */
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+
+        .modal .btn {
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            min-height: 40px;
+            border-radius: 8px;
+        }
+
+        .modal .btn.secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid #d0d4d8;
+            box-shadow: none;
+        }
+
+        @media (max-width:480px) {
+            .field.half {
+                width: 100%;
+                display: block
+            }
+
+            .field.half+.field.half {
+                margin-left: 0
+            }
+        }
+
+        /* Payment Modal Styles */
+        .payment-modal .payment-panel {
+            width: 480px;
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .payment-header h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+
+        .payment-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-option {
+            position: relative;
+            padding: 1.5rem;
+            border: 2px solid #e6e9ec;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--white);
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(61, 141, 165, 0.15);
+        }
+
+        .payment-option.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(61, 141, 165, 0.05) 0%, rgba(255, 213, 0, 0.05) 100%);
+            box-shadow: 0 0 0 3px rgba(61, 141, 165, 0.1);
+        }
+
+        .payment-icon {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d7a8c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        .payment-option.selected .payment-icon {
+            animation: none;
+            background: linear-gradient(135deg, var(--secondary) 0%, #e0c200 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .payment-option h4 {
+            margin: 0.5rem 0 0.3rem;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+
+        .payment-option p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .check-mark {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            background: var(--secondary);
+            color: var(--dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(255, 213, 0, 0.3);
+        }
+
+        .payment-option.selected .check-mark {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .payment-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .payment-modal .btn {
+            padding: 10px 24px;
+            font-size: 0.95rem;
+            min-height: 44px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .payment-modal .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(61, 141, 165, 0.2);
+        }
+
+        .payment-modal .btn.secondary {
+            background: var(--light);
+            color: var(--text);
+            border: none;
+        }
+
+        .payment-modal .btn.secondary:hover {
+            background: #e8ecf0;
+            box-shadow: none;
+        }
+
+        @media (max-width: 600px) {
+            .payment-modal .payment-panel {
+                width: 95%;
+            }
+
+            .payment-methods {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .payment-actions {
+                flex-direction: column;
+            }
+
+            .payment-modal .btn {
+                width: 100%;
+            }
+        }
+
+        /* Payment Confirmation Modal Styles */
+        .confirmation-panel {
+            width: 500px;
+            max-width: 95%;
+        }
+
+        .confirmation-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .payment-method-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d7a8c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--white);
+            margin: 0 auto 1rem;
+            box-shadow: 0 4px 16px rgba(61, 141, 165, 0.3);
+        }
+
+        .confirmation-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+
+        .reservation-summary {
+            background: linear-gradient(135deg, rgba(61, 141, 165, 0.05) 0%, rgba(255, 213, 0, 0.05) 100%);
+            border: 1px solid rgba(61, 141, 165, 0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            font-size: 0.95rem;
+        }
+
+        .summary-item.total {
+            margin-top: 0.5rem;
+            padding-top: 0.8rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .summary-label {
+            color: var(--muted);
+        }
+
+        .summary-value {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .summary-item.total .summary-value {
+            color: var(--secondary);
+            font-size: 1.3rem;
+        }
+
+        .summary-divider {
+            height: 1px;
+            background: rgba(61, 141, 165, 0.2);
+            margin: 0.8rem 0;
+        }
+
+        .payment-form {
+            margin-bottom: 1rem;
+        }
+
+        .payment-form-content {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .bank-logo {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .bank-logo img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+        }
+
+        .form-group input[type="checkbox"] {
+            margin-right: 0.6rem;
+            cursor: pointer;
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+        }
+
+        .form-group label:has(input[type="checkbox"]) {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e6e9ec;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(61, 141, 165, 0.1);
+        }
+
+        .input-prefix {
+            background: var(--light);
+            padding: 0 0.8rem;
+            color: var(--muted);
+            font-weight: 600;
+            border-right: 1px solid #e6e9ec;
+        }
+
+        .input-group .form-control {
+            border: none;
+            padding: 0.6rem 0.8rem;
+            flex: 1;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 0.4rem;
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 2px solid #e6e9ec;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(61, 141, 165, 0.1);
+        }
+
+        .payment-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .payment-confirmation-modal .btn {
+            padding: 10px 24px;
+            font-size: 0.95rem;
+            min-height: 44px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .payment-confirmation-modal .btn:not(.secondary):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(61, 141, 165, 0.2);
+        }
+
+        .payment-confirmation-modal .btn.secondary {
+            background: var(--light);
+            color: var(--text);
+            border: none;
+        }
+
+        .payment-confirmation-modal .btn.secondary:hover {
+            background: #e8ecf0;
+        }
+
+        .payment-security {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.8rem;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            color: #2e7d32;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .payment-security i {
+            font-size: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .confirmation-panel {
+                width: 95%;
+            }
+
+            .payment-actions {
+                flex-direction: column;
+            }
+
+            .payment-confirmation-modal .btn {
+                width: 100%;
+            }
+
+            .reservation-summary {
+                padding: 1rem;
+            }
+
+            .summary-item {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+
+    <script>
+        // Modal logic
+        const reserveBtns = document.querySelectorAll('.reserve-btn');
+        const reserveModal = document.getElementById('reserveModal');
+        const modalBackdrop = document.getElementById('modalBackdrop');
+        const modalClose = document.getElementById('modalClose');
+        const modalCancel = document.getElementById('modalCancel');
+        const roomInput = document.getElementById('roomInput');
+        const reserveForm = document.getElementById('reserveForm');
+        const reserveMsg = document.getElementById('reserveMsg');
+        const checkinInput = document.getElementById('checkin');
+        const checkoutInput = document.getElementById('checkout');
+        
+        // Establecer fecha mínima (hoy) para ambos inputs
+        const today = new Date().toISOString().split('T')[0];
+        checkinInput.min = today;
+        checkoutInput.min = today;
+
+        function openReserve(data) {
+            // set room and price display, then clear the other fields so there are no example values
+            roomInput.value = data.room + ' — $ ' + data.price;
+            document.getElementById('checkin').value = '';
+            document.getElementById('checkout').value = '';
+            document.getElementById('guestName').value = '';
+            document.getElementById('adults').value = '';
+            document.getElementById('children').value = '';
+            document.getElementById('email').value = '';
+            reserveModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            reserveMsg.textContent = '';
+        }
+
+        function closeReserve() {
+            reserveModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        reserveBtns.forEach(b => b.addEventListener('click', e => {
+            const room = e.currentTarget.dataset.room || '';
+            const price = e.currentTarget.dataset.price || '';
+            openReserve({ room, price });
+        }));
+
+        modalBackdrop.addEventListener('click', closeReserve);
+        modalClose.addEventListener('click', closeReserve);
+        modalCancel.addEventListener('click', closeReserve);
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeReserve();
+        });
+
+        reserveForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // validación básica de fechas
+            const checkin = document.getElementById('checkin').value;
+            const checkout = document.getElementById('checkout').value;
+            if (!checkin || !checkout || (new Date(checkout) <= new Date(checkin))) {
+                reserveMsg.style.color = 'crimson';
+                reserveMsg.textContent = 'Por favor selecciona fechas válidas (salida posterior a entrada).';
+                return;
+            }
+
+            // Guardar datos de la reserva en variables globales para usarlos después
+            window.reservaData = {
+                room: document.getElementById('roomInput').value || '',
+                checkin: checkin,
+                checkout: checkout,
+                name: document.getElementById('guestName').value,
+                adults: document.getElementById('adults').value,
+                children: document.getElementById('children').value,
+                email: document.getElementById('email').value,
+                paymentMethod: ''
+            };
+
+            // Extraer precio
+            const roomText = window.reservaData.room;
+            const parts = roomText.split('—');
+            if (parts.length >= 2) {
+                window.reservaData.room = parts[0].trim();
+                window.reservaData.price = parts[1].replace(/[^0-9.]/g, '').trim();
+            }
+
+            // Cerrar modal de reserva y abrir modal de pago
+            closeReserve();
+            setTimeout(() => {
+                openPaymentModal();
+            }, 300);
+        });
+
+        // PAYMENT MODAL LOGIC
+        const paymentModal = document.getElementById('paymentModal');
+        const paymentBackdrop = document.getElementById('paymentBackdrop');
+        const paymentClose = document.getElementById('paymentClose');
+        const confirmPayment = document.getElementById('confirmPayment');
+        const cancelPayment = document.getElementById('cancelPayment');
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        const paymentMsg = document.getElementById('paymentMsg');
+
+        let selectedPaymentMethod = '';
+
+        // Abrir modal de pago
+        function openPaymentModal() {
+            paymentModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            selectedPaymentMethod = '';
+            paymentOptions.forEach(opt => opt.classList.remove('selected'));
+            paymentMsg.textContent = '';
+        }
+
+        // Cerrar modal de pago
+        function closePaymentModal() {
+            paymentModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            selectedPaymentMethod = '';
+        }
+
+        // Event listeners para cerrar modal de pago
+        paymentBackdrop.addEventListener('click', closePaymentModal);
+        paymentClose.addEventListener('click', closePaymentModal);
+        cancelPayment.addEventListener('click', closePaymentModal);
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && paymentModal.getAttribute('aria-hidden') === 'false') {
+                closePaymentModal();
+            }
+        });
+
+        // Seleccionar método de pago
+        paymentOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remover selección anterior
+                paymentOptions.forEach(opt => opt.classList.remove('selected'));
+                
+                // Agregar selección al clickeado
+                option.classList.add('selected');
+                selectedPaymentMethod = option.getAttribute('data-method');
+                paymentMsg.textContent = '';
+                
+                // Pequeña animación visual
+                option.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    option.style.transform = '';
+                }, 150);
+            });
+
+            // Efecto de hover adicional
+            option.addEventListener('mouseenter', () => {
+                if (!option.classList.contains('selected')) {
+                    option.style.borderColor = 'var(--primary)';
+                }
+            });
+
+            option.addEventListener('mouseleave', () => {
+                if (!option.classList.contains('selected')) {
+                    option.style.borderColor = '';
+                }
+            });
+        });
+
+        // Confirmar pago - Abre modal de confirmación
+        confirmPayment.addEventListener('click', () => {
+            if (!selectedPaymentMethod) {
+                paymentMsg.style.color = 'crimson';
+                paymentMsg.textContent = 'Por favor selecciona un método de pago.';
+                return;
+            }
+
+            // Mostrar modal de confirmación
+            openConfirmationModal(selectedPaymentMethod);
+        });
+
+        // PAYMENT CONFIRMATION MODAL LOGIC
+        const confirmPaymentModal = document.getElementById('confirmPaymentModal');
+        const confirmPaymentBackdrop = document.getElementById('confirmPaymentBackdrop');
+        const confirmPaymentClose = document.getElementById('confirmPaymentClose');
+        const backToPayment = document.getElementById('backToPayment');
+        const paymentForm = document.getElementById('paymentForm');
+        const submitPayment = document.getElementById('submitPayment');
+        const confirmMsg = document.getElementById('confirmMsg');
+        const nequiGroup = document.getElementById('nequiGroup');
+        const paypalGroup = document.getElementById('paypalGroup');
+        const nequiPhone = document.getElementById('nequiPhone');
+        const paypalEmail = document.getElementById('paypalEmail');
+        const methodBadge = document.getElementById('methodBadge');
+
+        // Abrir modal de confirmación
+        function openConfirmationModal(method) {
+            closePaymentModal();
+            
+            // Mostrar badge según método
+            if (method === 'nequi') {
+                methodBadge.innerHTML = '<i class="fas fa-mobile-alt"></i>';
+                nequiGroup.style.display = 'block';
+                paypalGroup.style.display = 'none';
+                nequiPhone.value = '';
+                nequiPhone.focus();
+            } else {
+                methodBadge.innerHTML = '<i class="fab fa-paypal"></i>';
+                nequiGroup.style.display = 'none';
+                paypalGroup.style.display = 'block';
+                paypalEmail.value = '';
+                paypalEmail.focus();
+            }
+
+            // Llenar resumen de la reserva
+            document.getElementById('summaryRoom').textContent = window.reservaData.room;
+            document.getElementById('summaryCheckin').textContent = new Date(window.reservaData.checkin).toLocaleDateString('es-CO');
+            document.getElementById('summaryCheckout').textContent = new Date(window.reservaData.checkout).toLocaleDateString('es-CO');
+            
+            const adultos = parseInt(window.reservaData.adults) || 0;
+            const ninos = parseInt(window.reservaData.children) || 0;
+            const total = adultos + ninos;
+            document.getElementById('summaryGuests').textContent = `${adultos} adulto${adultos !== 1 ? 's' : ''} ${ninos > 0 ? ', ' + ninos + ' niño' + (ninos !== 1 ? 's' : '') : ''}`;
+            
+            // Calcular y mostrar total
+            const price = parseFloat(window.reservaData.price) || 0;
+            const numDays = Math.ceil((new Date(window.reservaData.checkout) - new Date(window.reservaData.checkin)) / (1000 * 60 * 60 * 24));
+            const totalPrice = price * numDays * total;
+            document.getElementById('summaryTotal').textContent = `$ ${totalPrice.toFixed(2)}`;
+
+            // Guardar total en datos globales
+            window.reservaData.totalPrice = totalPrice.toFixed(2);
+            window.reservaData.numDays = numDays;
+
+            // Abrir modal
+            confirmPaymentModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            confirmMsg.textContent = '';
+        }
+
+        // Cerrar modal de confirmación
+        function closeConfirmationModal() {
+            confirmPaymentModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            confirmMsg.textContent = '';
+        }
+
+        // Event listeners para cerrar modal
+        confirmPaymentBackdrop.addEventListener('click', closeConfirmationModal);
+        confirmPaymentClose.addEventListener('click', closeConfirmationModal);
+        backToPayment.addEventListener('click', () => {
+            closeConfirmationModal();
+            setTimeout(() => {
+                openPaymentModal();
+            }, 300);
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && confirmPaymentModal.getAttribute('aria-hidden') === 'false') {
+                closeConfirmationModal();
+            }
+        });
+
+        // Enviar formulario de pago
+        paymentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const method = selectedPaymentMethod;
+            let paymentData = {};
+
+            if (method === 'nequi') {
+                const phone = nequiPhone.value.trim();
+                if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+                    confirmMsg.style.color = 'crimson';
+                    confirmMsg.textContent = 'Por favor ingresa un número válido (10 dígitos).';
+                    return;
+                }
+                paymentData.phone = '+57' + phone;
+                paymentData.nequiPhone = phone;
+            } else if (method === 'paypal') {
+                const email = paypalEmail.value.trim();
+                if (!email.includes('@')) {
+                    confirmMsg.style.color = 'crimson';
+                    confirmMsg.textContent = 'Por favor ingresa un correo válido.';
+                    return;
+                }
+                paymentData.email = email;
+            }
+
+            // Mostrar loading
+            submitPayment.disabled = true;
+            submitPayment.style.opacity = '0.7';
+            submitPayment.textContent = 'Procesando transacción...';
+            confirmMsg.style.color = 'var(--muted)';
+            confirmMsg.textContent = 'Verificando datos...';
+
+            try {
+                // Crear payload con datos completos
+                const payload = new FormData();
+                payload.append('room', window.reservaData.room);
+                payload.append('price', window.reservaData.price || '0');
+                payload.append('numDays', window.reservaData.numDays);
+                payload.append('totalPrice', window.reservaData.totalPrice);
+                payload.append('checkin', window.reservaData.checkin);
+                payload.append('checkout', window.reservaData.checkout);
+                payload.append('name', window.reservaData.name);
+                payload.append('adults', window.reservaData.adults);
+                payload.append('children', window.reservaData.children);
+                payload.append('email', window.reservaData.email);
+                payload.append('paymentMethod', method);
+                
+                if (method === 'nequi') {
+                    payload.append('nequiPhone', paymentData.nequiPhone);
+                } else {
+                    payload.append('paypalEmail', paymentData.email);
+                }
+
+                // Enviar a PHP
+                confirmMsg.textContent = 'Guardando reserva...';
+                
+                try {
+                    const res = await fetch('php/reservar.php', { 
+                        method: 'POST', 
+                        body: payload 
+                    });
+                    
+                    if (!res.ok) {
+                        throw new Error(`Error del servidor: ${res.status} ${res.statusText}`);
+                    }
+                    
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        confirmMsg.style.color = 'green';
+                        confirmMsg.textContent = '¡Transacción aprobada! Redirigiendo...';
+                        submitPayment.textContent = '✓ Pago completado';
+                        
+                        const reservaId = data.id || 'N/A';
+                        const methodName = method === 'nequi' ? 'Nequi' : 'PayPal';
+                        const methodDetails = method === 'nequi' ? '+57' + paymentData.nequiPhone : paymentData.email;
+                        
+                        // Redirigir según método
+                        if (method === 'nequi') {
+                            // Redirigir a Nequi con el número de teléfono
+                            const nequiUrl = 'https://nequi.com.co/';
+                            alert(`✓ ¡Reserva creada!\n\nID: ${reservaId}\nTotal: $ ${window.reservaData.totalPrice}\n\nSerá redirigido a Nequi para completar el pago.`);
+                            window.location.href = nequiUrl;
+                        } else if (method === 'paypal') {
+                            // Redirigir a PayPal
+                            const paypalUrl = `https://www.paypal.com/signin`;
+                            alert(`✓ ¡Reserva creada!\n\nID: ${reservaId}\nTotal: $ ${window.reservaData.totalPrice}\n\nSerá redirigido a PayPal para completar el pago.`);
+                            window.location.href = paypalUrl;
+                        }
+                        
+                        closeConfirmationModal();
+                        paymentForm.reset();
+                        
+                        // Limpiar datos
+                        window.reservaData = null;
+                        selectedPaymentMethod = '';
+                    } else {
+                        confirmMsg.style.color = 'crimson';
+                        confirmMsg.textContent = data.message || 'Error procesando el pago.';
+                    }
+                } catch (err) {
+                    confirmMsg.style.color = 'crimson';
+                    confirmMsg.textContent = 'Error: ' + err.message;
+                    console.error('Error de fetch:', err);
+                }
+            } catch (err) {
+                confirmMsg.style.color = 'crimson';
+                confirmMsg.textContent = 'Error: ' + err.message;
+            } finally {
+                submitPayment.disabled = false;
+                submitPayment.style.opacity = '1';
+                submitPayment.textContent = 'Procesar Pago';
+            }
+        });
+
+        // Validación en tiempo real de Nequi
+        nequiPhone.addEventListener('input', function() {
+            this.value = this.value.replace(/[^\d]/g, '').slice(0, 10);
+            
+            // Auto-submit cuando se completen 10 dígitos
+            if (this.value.length === 10) {
+                // Validar que el formulario sea válido
+                if (paymentForm.checkValidity()) {
+                    // Marcar términos automáticamente
+                    document.getElementById('confirmTerms').checked = true;
+                    // Enviar formulario inmediatamente
+                    paymentForm.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+
+        // Validación en tiempo real de PayPal - auto-submit cuando se completa el email
+        paypalEmail.addEventListener('change', function() {
+            const email = this.value.trim();
+            if (email.includes('@') && email.length > 5) {
+                // Validar que el formulario sea válido
+                if (paymentForm.checkValidity()) {
+                    // Marcar términos automáticamente
+                    document.getElementById('confirmTerms').checked = true;
+                    // Enviar formulario inmediatamente
+                    paymentForm.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
