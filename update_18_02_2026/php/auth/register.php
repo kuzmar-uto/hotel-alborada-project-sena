@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode([
                     'success' => true,
                     'message' => '¡Registro exitoso! Bienvenido a Alborada Hotel.',
-                    'redirect' => 'dashboard.php'
+                    'redirect' => '/update_18_02_2026/index.php'
                 ]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Error al crear la cuenta. Intenta nuevamente.']);
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo json_encode([
                         'success' => true,
                         'message' => '¡Registro exitoso! Bienvenido a Alborada Hotel.',
-                        'redirect' => 'dashboard.php'
+                        'redirect' => '/update_18_02_2026/index.php'
                     ]);
                 } else {
                     echo json_encode(['success' => false, 'message' => 'Error al crear la cuenta. Intenta nuevamente.']);

@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode([
                     'success' => true,
                     'message' => '¡Login exitoso!',
-                    'redirect' => 'dashboard.php'
+                    'redirect' => '/update_18_02_2026/index.php'
                 ]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Contraseña incorrecta.']);

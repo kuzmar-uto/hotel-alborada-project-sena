@@ -51,15 +51,15 @@ try {
     if ($stmt->rowCount() > 0) {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $userId = $row['id'];
-
-        // Actualizar Contraseña a NULL para indicar cuenta gestionada por Google (opcional)
-        $upd = $db->prepare('UPDATE usuarios_alborada SET Contraseña = NULL WHERE id = :id');
-        $upd->bindParam(':id', $userId);
-        $upd->execute();
     } else {
-        // Insertar nuevo usuario con Contraseña = NULL
-        $ins = $db->prepare('INSERT INTO usuarios_alborada (Correo, Contraseña) VALUES (:email, NULL)');
+        // Generar una contraseña aleatoria y segura para usuarios de Google
+        $random_password = bin2hex(random_bytes(16)); // 32 caracteres hexadecimales
+        $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
+        
+        // Insertar nuevo usuario con contraseña generada
+        $ins = $db->prepare('INSERT INTO usuarios_alborada (Correo, Contraseña) VALUES (:email, :password)');
         $ins->bindParam(':email', $email);
+        $ins->bindParam(':password', $hashed_password);
         $ins->execute();
         $userId = $db->lastInsertId();
     }
@@ -69,7 +69,7 @@ try {
     $_SESSION['usuario_email'] = $email;
     $_SESSION['logged_in'] = true;
 
-    echo json_encode(['success' => true, 'message' => 'Login con Google exitoso.', 'redirect' => 'php/dashboard.php']);
+    echo json_encode(['success' => true, 'message' => 'Login con Google exitoso.', 'redirect' => '/update_18_02_2026/index.php']);
     exit;
 
 } catch (PDOException $e) {
