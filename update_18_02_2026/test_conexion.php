@@ -216,7 +216,7 @@ require_once 'php/config/database.php';
             <ul>
                 <li>🔗 Ir a <a href="cuenta.html" class="button">Página de Registro</a></li>
                 <li>🔗 Ir a <a href="login.html" class="button">Página de Login</a></li>
-                <li>🔗 Ir a <a href="index.html" class="button">Página Principal</a></li>
+                <li>🔗 Ir a <a href="index.php" class="button">Página Principal</a></li>
             </ul>
         </div>
     </div>

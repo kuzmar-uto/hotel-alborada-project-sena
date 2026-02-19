@@ -1,3 +1,16 @@
+<?php
+// Conexión a la base de datos
+$servername = "127.0.0.1";
+$username   = "root";
+$password   = "";
+$dbname     = "alborada";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
+$conn->set_charset("utf8mb4");
+?>
 <!DOCTYPE html>
 <html lang="es-CO">
 
@@ -89,7 +102,7 @@
         </div>
     </section>
 
-    <!-- Rooms Section -->
+    <!-- Rooms Section - DINÁMICO -->
     <section id="rooms">
         <div class="container">
             <div class="section-title">
@@ -97,104 +110,102 @@
                 <p>Elige entre nuestras cómodas habitaciones diseñadas para tu máximo confort</p>
             </div>
             <div class="rooms-grid">
+                <?php
+                $result = $conn->query("SELECT * FROM habitaciones ORDER BY precio ASC LIMIT 6");
+
+                if ($result && $result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()):
+                        $img = !empty($row['imagen']) ? $row['imagen'] : 'https://via.placeholder.com/500x400/cccccc/ffffff?text=Habitación';
+                        $nombre = htmlspecialchars($row['nombre']);
+                        $descripcion = htmlspecialchars($row['descripcion']);
+                        $precio = number_format($row['precio'], 0);
+                        $tipo = htmlspecialchars($row['tipo_de_habitacion'] ?? 'Estándar');
+                        $disponibles = isset($row['habitaciones_disponibles']) ? intval($row['habitaciones_disponibles']) : 0;
+                ?>
                 <div class="room-card">
                     <div class="room-image">
-                        <img src="https://alboradahotel.com/wp-content/uploads/2023/09/HOTEL-EN-MELGAR-ALBORADA-HOTEL-8.jpg"
-                            alt="Habitación Clásica">
+                        <img src="<?= htmlspecialchars($img) ?>" alt="<?= $nombre ?>">
+                        <?php if ($disponibles > 0): ?>
+                            <span class="availability-badge">Disponible</span>
+                        <?php else: ?>
+                            <span class="availability-badge unavailable">No disponible</span>
+                        <?php endif; ?>
                     </div>
                     <div class="room-info">
-                        <h3>Habitaciones Clásicas</h3>
-                        <p>Nuestras habitaciones clásicas ofrecen todo el confort que necesitas para una estadía
-                            placentera.</p>
-                        <ul class="room-features">
-                            <li><i class="fas fa-check"></i> Cama King Size o dos camas individuales</li>
-                            <li><i class="fas fa-check"></i> Aire acondicionado</li>
-                            <li><i class="fas fa-check"></i> TV por cable</li>
-                            <li><i class="fas fa-check"></i> Baño privado</li>
-                            <li><i class="fas fa-check"></i> Wi-Fi gratuito</li>
-                        </ul>
-                        <a href="habitaciones.html" class="btn">Ver Detalles</a>
+                        <div class="room-header">
+                            <h3><?= $nombre ?></h3>
+                            <span class="room-type"><?= $tipo ?></span>
+                        </div>
+                        <p><?= $descripcion ?></p>
+                        <div class="room-price">
+                            <span class="price">$<?= $precio ?></span>
+                            <span class="per-night">por noche</span>
+                        </div>
+                        <a href="habitaciones.php" class="btn">Ver Detalles</a>
                     </div>
                 </div>
-                <div class="room-card">
-                    <div class="room-image">
-                        <img src="https://alboradahotel.com/wp-content/uploads/2023/09/HOTEL-EN-MELGAR-ALBORADA-HOTEL-3.jpg"
-                            alt="Habitación Superior">
-                    </div>
-                    <div class="room-info">
-                        <h3>Habitaciones Superiores</h3>
-                        <p>Disfruta de un espacio más amplio y comodidades adicionales en nuestras habitaciones
-                            superiores.</p>
-                        <ul class="room-features">
-                            <li><i class="fas fa-check"></i> Amplio espacio con área de estar</li>
-                            <li><i class="fas fa-check"></i> Cama King Size premium</li>
-                            <li><i class="fas fa-check"></i> Mini bar</li>
-                            <li><i class="fas fa-check"></i> TV pantalla plana</li>
-                            <li><i class="fas fa-check"></i> Terraza privada</li>
-                        </ul>
-                        <a href="habitaciones.html" class="btn">Ver Detalles</a>
-                    </div>
-                </div>
+                <?php 
+                    endwhile;
+                } else {
+                    echo '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                            <p style="color: #999; font-size: 1.1rem;">No hay habitaciones disponibles en este momento</p>
+                          </div>';
+                }
+                ?>
             </div>
             <div style="text-align: center; margin-top: 50px;">
-                <a href="habitaciones.html" class="btn" style="background-color: var(--primary);">Ver Todas las
-                    Habitaciones</a>
+                <a href="habitaciones.php" class="btn" style="background-color: var(--primary);">Ver Todas las Habitaciones</a>
             </div>
         </div>
     </section>
 
-
-
-    <!-- webon voy a cambiar esto de aqui -->
-
-<!-- Services Section -->
-<section id="services">
-    <div class="container">
-        <div class="section-title">
-            <h2>Nuestros Servicios</h2>
-            <p>Disfruta de todas nuestras instalaciones y servicios durante tu estadía</p>
-        </div>
-       
-        <div class="services-grid">
-            <div class="service-card">
-                <div class="service-icon"><i class="fas fa-swimming-pool"></i></div>
-                <h3>Piscinas y Tobogán</h3>
-                <p>Dos piscinas, una para adultos y otra para niños, con tobogán acuático para diversión garantizada.</p>
+    <!-- Services Section -->
+    <section id="services">
+        <div class="container">
+            <div class="section-title">
+                <h2>Nuestros Servicios</h2>
+                <p>Disfruta de todas nuestras instalaciones y servicios durante tu estadía</p>
             </div>
            
-            <div class="service-card">
-                <div class="service-icon"><i class="fas fa-spa"></i></div>
-                <h3>Zona de Spa</h3>
-                <p>Relájate en nuestro sauna, turco y jacuzzi después de un día de diversión en las piscinas.</p>
-            </div>
-           
-            <div class="service-card">
-                <div class="service-icon"><i class="fas fa-utensils"></i></div>
-                <h3 style="font-size: 1.3rem; word-break: break-word;">Restaurante</h3>
-                <p>Disfruta de deliciosos platos a la carta en nuestro restaurante con los mejores sabores de la región.</p>
-            </div>
-           
-            <div class="service-card">
-                <div class="service-icon"><i class="fas fa-dumbbell"></i></div>
-                <h3>Gimnasio</h3>
-                <p>Mantén tu rutina de ejercicios en nuestro gimnasio completamente equipado.</p>
-            </div>
-           
-            <div class="service-card">
-                <div class="service-icon"><i class="fas fa-cocktail"></i></div>
-                <h3>Bar</h3>
-                <p>Disfruta de una amplia variedad de bebidas y cócteles en nuestro acogedor bar.</p>
-            </div>
-           
-            <div class="service-card">
-                <div class="service-icon"><i class="fas fa-parking"></i></div>
-                <h3>Parqueadero Gratuito</h3>
-                <p>Estacionamiento seguro y gratuito para todos nuestros huéspedes durante su estadía.</p>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-swimming-pool"></i></div>
+                    <h3>Piscinas y Tobogán</h3>
+                    <p>Dos piscinas, una para adultos y otra para niños, con tobogán acuático para diversión garantizada.</p>
+                </div>
+               
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-spa"></i></div>
+                    <h3>Zona de Spa</h3>
+                    <p>Relájate en nuestro sauna, turco y jacuzzi después de un día de diversión en las piscinas.</p>
+                </div>
+               
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-utensils"></i></div>
+                    <h3 style="font-size: 1.3rem; word-break: break-word;">Restaurante</h3>
+                    <p>Disfruta de deliciosos platos a la carta en nuestro restaurante con los mejores sabores de la región.</p>
+                </div>
+               
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-dumbbell"></i></div>
+                    <h3>Gimnasio</h3>
+                    <p>Mantén tu rutina de ejercicios en nuestro gimnasio completamente equipado.</p>
+                </div>
+               
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-cocktail"></i></div>
+                    <h3>Bar</h3>
+                    <p>Disfruta de una amplia variedad de bebidas y cócteles en nuestro acogedor bar.</p>
+                </div>
+               
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-parking"></i></div>
+                    <h3>Parqueadero Gratuito</h3>
+                    <p>Estacionamiento seguro y gratuito para todos nuestros huéspedes durante su estadía.</p>
+                </div>
             </div>
         </div>
-    </div>
-</section>
-
+    </section>
 
     <!-- Contact Section -->
     <section id="contact">

@@ -293,7 +293,7 @@ if ($action == 'reservas') {
     <!-- Sidebar -->
     <div class="admin-sidebar col-md-3 col-lg-2 p-3">
         <div class="sidebar-logo-container" style="text-align: center; margin-bottom: 1.5rem;">
-            <a href="../index.html">
+            <a href="../index.php">
                 <img src="https://alboradahotel.com/wp-content/uploads/2023/09/Alborada-Original-en-MELGAR-hoteles-en-melgar.png" alt="Alborada Hotel" class="sidebar-logo" style="max-height: 80px; width: auto; transition: all 0.3s ease;">
             </a>
         </div>

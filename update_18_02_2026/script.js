@@ -32,6 +32,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Google Profile Icon Click Handler
+    const googleProfileBtn = document.getElementById('google-profile-btn');
+    if (googleProfileBtn) {
+        googleProfileBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Verificar si el usuario está autenticado llamando al backend
+            fetch('php/auth/get_user_profile.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Redirigir al perfil de Google
+                        window.location.href = 'php/auth/google_profile.php';
+                    } else {
+                        // Usuario no autenticado, ir a login
+                        window.location.href = 'cuenta.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // En caso de error, ir a cuenta.html
+                    window.location.href = 'cuenta.html';
+                });
+        });
+    }
+    
     // Close menu when pressing escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {

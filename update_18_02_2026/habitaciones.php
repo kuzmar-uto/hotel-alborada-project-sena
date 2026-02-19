@@ -147,7 +147,7 @@ if ($conn->connect_error) {
         <div class="container">
             <div id="main-header">
                 <div class="logo">
-                    <a href="index.html">
+                    <a href="index.php">
                         <img src="https://alboradahotel.com/wp-content/uploads/2023/09/Alborada-Original-en-MELGAR-hoteles-en-melgar.png"
                             alt="Alborada Hotel Melgar">
                     </a>
@@ -155,14 +155,16 @@ if ($conn->connect_error) {
                 <nav>
                     <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
                     <ul>
-                        <li><a href="index.html">Inicio</a></li>
-                        <li><a href="index.html#about">Nosotros</a></li>
+                        <li><a href="index.php">Inicio</a></li>
+                        <li><a href="index.php#about">Nosotros</a></li>
                         <li><a href="habitaciones.php">Habitaciones</a></li>
-                        <li><a href="index.html#services">Servicios</a></li>
-                        <li><a href="index.html#contact">Contacto</a></li>
-                        <li>
-                            <a href="cuenta.html" class="btn btn-account"
-                               style="background:#ffd500;color:#111;border:1px solid rgba(0,0,0,0.08);">Mi Cuenta</a>
+                        <li><a href="index.php#services">Servicios</a></li>
+                        <li><a href="index.php#contact">Contacto</a></li>
+                        <li class="account-menu">
+                            <a href="cuenta.html" class="btn btn-account">Mi Cuenta</a>
+                            <a href="#" id="google-profile-btn" class="google-profile-icon" title="Perfil de Google">
+                                <i class="fab fa-google"></i>
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -433,6 +435,7 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 });
 </script>
+<script src="script.js"></script>
 </body>
 </html>
 

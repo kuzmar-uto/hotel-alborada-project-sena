@@ -251,6 +251,37 @@ nav ul li a:hover::after {
     width: 100%;
 }
 
+/* Google Profile Icon */
+.account-menu {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    margin-left: 25px;
+}
+
+.google-profile-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    font-size: 20px;
+    transition: var(--transition);
+    border: 2px solid transparent;
+    cursor: pointer;
+    min-height: 48px;
+    min-width: 48px;
+}
+
+.google-profile-icon:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--accent);
+    transform: scale(1.1);
+}
+
 .mobile-menu-btn {
     display: none;
     background: none;
@@ -398,6 +429,70 @@ nav ul li a:hover::after {
 .room-features li i {
     color: var(--primary);
     margin-right: 10px;
+}
+
+/* Estilos para la sección de habitaciones dinámica */
+.availability-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #28a745;
+    color: var(--white);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 10;
+}
+
+.availability-badge.unavailable {
+    background-color: #dc3545;
+}
+
+.room-image {
+    position: relative;
+}
+
+.room-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.room-header h3 {
+    flex-grow: 1;
+}
+
+.room-type {
+    display: inline-block;
+    background-color: var(--secondary);
+    color: var(--dark);
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.room-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 15px 0;
+    font-size: 1.1rem;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.per-night {
+    font-size: 0.9rem;
+    color: var(--text);
 }
 
 /* Services Section */
@@ -620,6 +715,25 @@ footer {
 
     nav ul li {
         margin: 20px 0;
+    }
+
+    .account-menu {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+    }
+
+    .account-menu .btn-account {
+        width: 100%;
+        text-align: center;
+    }
+
+    .google-profile-icon {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+        font-size: 18px;
     }
 
     .overlay {

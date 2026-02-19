@@ -313,6 +313,73 @@ require_once __DIR__ . '/php/config/google.php';
             }
             tryInit();
         })();
+
+        // Manejador del formulario de login tradicional
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const remember = document.getElementById('remember').checked;
+                    
+                    const formData = new FormData();
+                    formData.append('email', email);
+                    formData.append('password', password);
+                    formData.append('remember', remember ? '1' : '0');
+                    
+                    fetch('php/auth/login.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message || 'Login exitoso');
+                                window.location.href = data.redirect || 'index.php';
+                            } else {
+                                alert(data.message || 'Error al iniciar sesión');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error de conexión. Intenta nuevamente.');
+                        });
+                });
+            }
+            
+            // Manejador del toggle de contraseña
+            const togglePassword = document.getElementById('togglePassword');
+            if (togglePassword) {
+                togglePassword.addEventListener('click', function() {
+                    const passwordInput = document.getElementById('password');
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+                });
+            }
+            
+            // Manejador del enlace "Olvide mi contraseña"
+            const forgotPasswordLink = document.getElementById('forgotPassword');
+            if (forgotPasswordLink) {
+                forgotPasswordLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const modal = document.getElementById('passwordModal');
+                    if (modal) modal.classList.add('active');
+                });
+            }
+            
+            // Cerrar modal
+            const closeModal = document.getElementById('closeModal');
+            if (closeModal) {
+                closeModal.addEventListener('click', function() {
+                    const modal = document.getElementById('passwordModal');
+                    if (modal) modal.classList.remove('active');
+                });
+            }
+        });
     </script>
 </body>
 
