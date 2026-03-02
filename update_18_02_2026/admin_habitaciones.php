@@ -478,7 +478,7 @@ if ($action == 'reservas') {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Precio por noche (USD)</label>
+                            <label class="form-label fw-bold">Precio por noche</label>
                             <input type="number" step="0.01" name="precio" class="form-control" value="<?php echo $habitacion ? $habitacion['precio'] : ''; ?>" required>
                         </div>
 

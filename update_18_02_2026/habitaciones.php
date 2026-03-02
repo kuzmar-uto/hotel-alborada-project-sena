@@ -37,8 +37,8 @@ if ($conn->connect_error) {
 
 
         :root {
-            --primary:    #2c5282;     /* azul elegante */
-            --primary-dark: #1a365d;
+            --primary:    #3d8da5;     /* azul principal del sitio */
+            --primary-dark: #2d6f82;   /* azul oscuro hover */
             --accent:     #d69e2e;     /* dorado suave */
             --light:      #f7fafc;
             --gray:       #4a5568;
@@ -274,6 +274,8 @@ if ($conn->connect_error) {
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SDK Mercado Pago -->
+<script src="https://sdk.mercadopago.com/js/v2"></script>
 
 <!-- Reserva Modal -->
 <div class="modal fade reserve-modal" id="reserveModal" tabindex="-1" aria-hidden="true">
@@ -302,6 +304,12 @@ if ($conn->connect_error) {
                     <input type="hidden" name="room_tipo" id="res-room-tipo">
                     <input type="hidden" name="room_disponibles" id="res-room-disponibles">
                     <input type="hidden" name="room_max" id="res-room-max">
+
+                    <!-- Mensaje informativo de adelanto -->
+                    <div class="alert alert-info mb-4" style="border-radius: 8px; border-left: 4px solid var(--primary);">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Para confirmar tu reserva</strong>, deberás realizar un adelanto de <span id="adelanto-amount" style="font-weight: bold; color: var(--primary);">$20.00</span>
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label">Fecha de entrada</label>
@@ -335,7 +343,9 @@ if ($conn->connect_error) {
 
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Confirmar reserva</button>
+                        <button type="submit" class="btn text-white" style="background-color: var(--primary);">
+                            <i class="bi bi-credit-card"></i> Ir a pago
+                        </button>
                     </div>
                 </form>
             </div>
@@ -351,6 +361,7 @@ document.addEventListener('DOMContentLoaded', function(){
         btn.addEventListener('click', function(){
             var id = this.getAttribute('data-id');
             var name = this.getAttribute('data-name');
+            var price = this.getAttribute('data-price') || '20.00';  // Precio por defecto o adelanto
             var desc = this.getAttribute('data-desc') || '';
             var img = this.getAttribute('data-img') || '';
             var caracs = this.getAttribute('data-caracs') || '';
@@ -361,12 +372,16 @@ document.addEventListener('DOMContentLoaded', function(){
             document.getElementById('res-room').value = id;
             document.getElementById('res-room-name').value = name;
             document.getElementById('res-room-desc').value = desc;
-            document.getElementById('res-room-price').value = '';
+            document.getElementById('res-room-price').value = price;  // Guardar el precio
             document.getElementById('res-room-img-hidden').value = img;
             document.getElementById('res-room-caracs').value = caracs;
             document.getElementById('res-room-tipo').value = '';
             document.getElementById('res-room-disponibles').value = disponibles;
             document.getElementById('res-room-max').value = max;
+
+            // Actualizar el monto del adelanto mostrado (usar el precio como adelanto mínimo)
+            var adelantoAmount = Math.max(parseFloat(price) || 20, 20.00).toFixed(2);
+            document.getElementById('adelanto-amount').textContent = '$' + adelantoAmount;
 
             // update visible preview
             document.getElementById('res-room-name-display').textContent = name || '';
@@ -398,7 +413,6 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     });
 
-
     // enforce salida >= entrada +1 when entrada changes
     document.getElementById('res-fecha-entrada').addEventListener('change', function(){
         var ent = this.value;
@@ -411,26 +425,66 @@ document.addEventListener('DOMContentLoaded', function(){
         if (salidaEl.value < min) salidaEl.value = min;
     });
 
-    // enviar formulario por AJAX
+    // Manejador del formulario para crear preferencia de pago en MercadoPago
     document.getElementById('reserveForm').addEventListener('submit', function(e){
         e.preventDefault();
+        
+        // Validar que todos los campos requeridos estén completos
         var form = e.target;
-        var data = new FormData(form);
-        // no se necesitan campos adicionales, ya los tiene
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
 
-        fetch('php/reservar.php', {
+        // Crear objeto con datos del formulario
+        var reserveData = {
+            id_habitacion: document.getElementById('res-room').value,
+            room_name: document.getElementById('res-room-name').value,
+            room_desc: document.getElementById('res-room-desc').value,
+            room_price: parseFloat(document.getElementById('res-room-price').value) || 20.00,
+            fecha_entrada: document.getElementById('res-fecha-entrada').value,
+            fecha_salida: document.getElementById('res-fecha-salida').value,
+            nombre_completo: document.getElementById('res-nombre').value,
+            adultos: parseInt(document.getElementById('res-adultos').value) || 0,
+            ninos: parseInt(document.getElementById('res-ninos').value) || 0,
+            email: document.getElementById('res-email').value
+        };
+
+        // Mostrar loading
+        var submitBtn = form.querySelector('button[type="submit"]');
+        var originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+
+        // Enviar a crear preferencia de pago
+        fetch('php/create_payment_preference.php', {
             method: 'POST',
-            body: data
-        }).then(function(res){ return res.json(); }).then(function(json){
-            if (json && json.success){
-                alert('Reserva confirmada — ID: ' + (json.id || 'N/A'));
-                reserveModal.hide();
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(reserveData)
+        })
+        .then(function(res){ return res.json(); })
+        .then(function(json){
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            if (json && json.success && json.init_point) {
+                // Redirigir a MercadoPago
+                window.location.href = json.init_point;
+            } else if (json && json.sandbox_init_point) {
+                // Usar sandbox si no hay init_point (modo desarrollo)
+                window.location.href = json.sandbox_init_point;
             } else {
-                alert('Error: ' + (json.message || 'No se pudo completar la reserva'));
+                alert('Error: ' + (json.message || 'No se pudo crear la preferencia de pago'));
+                console.error('Respuesta:', json);
             }
-        }).catch(function(err){
+        })
+        .catch(function(err){
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
             console.error(err);
-            alert('Error de red al enviar la reserva');
+            alert('Error de red al procesar la reserva: ' + err.message);
         });
     });
 });

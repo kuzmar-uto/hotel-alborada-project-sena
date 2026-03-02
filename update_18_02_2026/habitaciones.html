@@ -1150,115 +1150,60 @@
             }
         });
 
-        // Enviar formulario de pago
+        // Enviar formulario de pago - INTEGRACIÓN CON MERCADO PAGO
         paymentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            const method = selectedPaymentMethod;
-            let paymentData = {};
-
-            if (method === 'nequi') {
-                const phone = nequiPhone.value.trim();
-                if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
-                    confirmMsg.style.color = 'crimson';
-                    confirmMsg.textContent = 'Por favor ingresa un número válido (10 dígitos).';
-                    return;
-                }
-                paymentData.phone = '+57' + phone;
-                paymentData.nequiPhone = phone;
-            } else if (method === 'paypal') {
-                const email = paypalEmail.value.trim();
-                if (!email.includes('@')) {
-                    confirmMsg.style.color = 'crimson';
-                    confirmMsg.textContent = 'Por favor ingresa un correo válido.';
-                    return;
-                }
-                paymentData.email = email;
-            }
 
             // Mostrar loading
             submitPayment.disabled = true;
             submitPayment.style.opacity = '0.7';
             submitPayment.textContent = 'Procesando transacción...';
             confirmMsg.style.color = 'var(--muted)';
-            confirmMsg.textContent = 'Verificando datos...';
+            confirmMsg.textContent = 'Creando preferencia de pago con Mercado Pago...';
 
             try {
-                // Crear payload con datos completos
-                const payload = new FormData();
-                payload.append('room', window.reservaData.room);
-                payload.append('price', window.reservaData.price || '0');
-                payload.append('numDays', window.reservaData.numDays);
-                payload.append('totalPrice', window.reservaData.totalPrice);
-                payload.append('checkin', window.reservaData.checkin);
-                payload.append('checkout', window.reservaData.checkout);
-                payload.append('name', window.reservaData.name);
-                payload.append('adults', window.reservaData.adults);
-                payload.append('children', window.reservaData.children);
-                payload.append('email', window.reservaData.email);
-                payload.append('paymentMethod', method);
-                
-                if (method === 'nequi') {
-                    payload.append('nequiPhone', paymentData.nequiPhone);
-                } else {
-                    payload.append('paypalEmail', paymentData.email);
-                }
+                // Preparar datos de la reserva para crear la preferencia de pago
+                const paymentPayload = {
+                    id_habitacion: window.reservaData.id_habitacion || '',
+                    fecha_entrada: window.reservaData.checkin,
+                    fecha_salida: window.reservaData.checkout,
+                    nombre_completo: window.reservaData.name,
+                    adultos: window.reservaData.adults,
+                    ninos: window.reservaData.children,
+                    email: window.reservaData.email,
+                    room_price: window.reservaData.price || 0,
+                    room_name: window.reservaData.room
+                };
 
-                // Enviar a PHP
-                confirmMsg.textContent = 'Guardando reserva...';
-                
-                try {
-                    const res = await fetch('php/reservar.php', { 
-                        method: 'POST', 
-                        body: payload 
-                    });
-                    
-                    if (!res.ok) {
-                        throw new Error(`Error del servidor: ${res.status} ${res.statusText}`);
-                    }
-                    
-                    const data = await res.json();
-                    
-                    if (data.success) {
-                        confirmMsg.style.color = 'green';
-                        confirmMsg.textContent = '¡Transacción aprobada! Redirigiendo...';
-                        submitPayment.textContent = '✓ Pago completado';
-                        
-                        const reservaId = data.id || 'N/A';
-                        const methodName = method === 'nequi' ? 'Nequi' : 'PayPal';
-                        const methodDetails = method === 'nequi' ? '+57' + paymentData.nequiPhone : paymentData.email;
-                        
-                        // Redirigir según método
-                        if (method === 'nequi') {
-                            // Redirigir a Nequi con el número de teléfono
-                            const nequiUrl = 'https://nequi.com.co/';
-                            alert(`✓ ¡Reserva creada!\n\nID: ${reservaId}\nTotal: $ ${window.reservaData.totalPrice}\n\nSerá redirigido a Nequi para completar el pago.`);
-                            window.location.href = nequiUrl;
-                        } else if (method === 'paypal') {
-                            // Redirigir a PayPal
-                            const paypalUrl = `https://www.paypal.com/signin`;
-                            alert(`✓ ¡Reserva creada!\n\nID: ${reservaId}\nTotal: $ ${window.reservaData.totalPrice}\n\nSerá redirigido a PayPal para completar el pago.`);
-                            window.location.href = paypalUrl;
-                        }
-                        
-                        closeConfirmationModal();
-                        paymentForm.reset();
-                        
-                        // Limpiar datos
-                        window.reservaData = null;
-                        selectedPaymentMethod = '';
-                    } else {
-                        confirmMsg.style.color = 'crimson';
-                        confirmMsg.textContent = data.message || 'Error procesando el pago.';
-                    }
-                } catch (err) {
+                // Enviar solicitud a PHP para crear preferencia
+                const response = await fetch('php/create_payment_preference.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentPayload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    confirmMsg.style.color = 'green';
+                    confirmMsg.textContent = 'Redirigiendo a Mercado Pago...';
+
+                    // Redirigir a Mercado Pago en 2 segundos
+                    setTimeout(() => {
+                        // Usar la URL de sandbox si estamos en desarrollo
+                        const mpUrl = data.sandbox_init_point || data.init_point;
+                        window.location.href = mpUrl;
+                    }, 2000);
+                } else {
                     confirmMsg.style.color = 'crimson';
-                    confirmMsg.textContent = 'Error: ' + err.message;
-                    console.error('Error de fetch:', err);
+                    confirmMsg.textContent = data.message || 'Error al crear la preferencia de pago.';
                 }
             } catch (err) {
                 confirmMsg.style.color = 'crimson';
                 confirmMsg.textContent = 'Error: ' + err.message;
+                console.error('Error:', err);
             } finally {
                 submitPayment.disabled = false;
                 submitPayment.style.opacity = '1';
